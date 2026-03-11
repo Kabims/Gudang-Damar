@@ -13,7 +13,7 @@
 | Bimantara Ardi Winata      | 103012300282        | Back-End Programmer                   |
 | Muhammad Alvin Ababil      | 103012330064        | Project Manager & Back-End Programmer |
 | Arya Wijaya                | 103012330330        | Back-End Programmer                   |
-| Fadhil Abithyas Effendi    | 103012330370        | Front-End Programmer                  |
+| Fadhil Abithyasa Effendi   | 103012330370        | Front-End Programmer                  |
 
 ## 🚀 Features
 
