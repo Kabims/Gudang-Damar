@@ -3,6 +3,18 @@
 **Note for developers : fork the repo first before edit or commit.**
 
 ## Description
+Gudang Damar adalah aplikasi berbasis website yang dirancang untuk mengoptimalkan 
+efisiensi pelayanan toko melalui pengelolaan data barang yang terpusat dan terorganisir. 
+Dengan menyediakan akses real-time terhadap informasi stok, harga, dan kategori, aplikasi 
+ini mempercepat proses transaksi serta mempermudah pencarian maupun pengurutan 
+barang secara akurat bagi kasir. Selain fungsi inventaris standar, sistem ini mendukung 
+pengelolaan pesanan khusus dengan spesifikasi tertentu, dokumentasi layanan servis untuk 
+barang yang rusak, hingga pendataan supplier dan riwayat aktivitas secara menyeluruh. 
+Keamanan data operasional dijamin melalui sistem manajemen hak akses pengguna, 
+sementara fitur visualisasi data dalam bentuk grafik memberikan wawasan informatif yang 
+memudahkan pengambilan keputusan strategis demi menciptakan pengalaman pelanggan 
+yang lebih baik. Terdapat juga fitur image generation untuk melihat preview produk 
+berdasarkan atribut dan ukuran.
 
 ## 🧑‍💻 Team
 
@@ -32,6 +44,30 @@
 ## 🚀 How to Run the Project
 
 ### Step 1. Clone the Repository
+```bash
+https://github.com/NeoRyumasil/Gudang-Damar.git
+```
+
+### Step 2. Go to the App Folder
+```bash
+cd app
+```
+
+### Step 3. Set the .env File, Copy .env.example
+
+### Step 4. For First Setup Run the Setup
+```bash
+composer run setup
+```
+
+### Step 5. Run the Project
+```bash
+composer run dev
+```
+
+### Step 6. Go to Localhost Links to See the Project
 
 ## 📋 Requirements
+- Supabase
+- HuggingFace API Key
 
