@@ -93,8 +93,6 @@ return [
             'username' => env('DB_USERNAME', 'root'),
             'password' => env('DB_PASSWORD', ''),
             'charset' => env('DB_CHARSET', 'utf8'),
-            'supabase_url' => env('SUPABASE_URL'),
-            'supabase_key' => env('SUPABASE_KEY'),
             'prefix' => '',
             'prefix_indexes' => true,
             'search_path' => 'public',
