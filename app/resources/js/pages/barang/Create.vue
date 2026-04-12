@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useForm } from '@inertiajs/vue3';
+import { Link, useForm } from '@inertiajs/vue3';
 
 const form = useForm({
     nama: '',
@@ -81,10 +81,10 @@ function submit() {
                         class="bg-blue-500 text-white px-4 py-2 rounded-lg">
                     Simpan
                 </button>
-                <a href="/barang"
-                   class="bg-gray-400 text-white px-4 py-2 rounded-lg">
-                   Batal
-                </a>
+                <Link href="/barang"
+                      class="bg-gray-400 text-white px-4 py-2 rounded-lg">
+                    Batal
+                </Link>
             </div>
         </form>
     </div>

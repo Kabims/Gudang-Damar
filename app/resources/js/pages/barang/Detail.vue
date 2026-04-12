@@ -1,18 +1,15 @@
 <script setup lang="ts">
+import { Link } from '@inertiajs/vue3';
+
 defineProps<{
     barang: {
-        id_barang: number;
-        nama: string;
-        harga: number;
-        jumlah: number;
-        total: number;
-        ukuran: number;
-        bentuk: string;
-        ketebalan: string;
-        bahan: string;
-        guna_merek: string;
+        id_barang: number; nama: string; harga: number; jumlah: number;
+        total: number; ukuran: number; bentuk: string; ketebalan: string;
+        bahan: string; guna_merek: string;
     };
 }>();
+
+const rupiah = (n: number) => 'Rp ' + n.toLocaleString('id-ID');
 </script>
 
 <template>
@@ -25,19 +22,19 @@ defineProps<{
         <div class="info-line"><span>Ketebalan</span><span>{{ barang.ketebalan }}</span></div>
         <div class="info-line"><span>Bahan</span><span>{{ barang.bahan }}</span></div>
         <div class="info-line"><span>Merek</span><span>{{ barang.guna_merek }}</span></div>
-        <div class="info-line"><span>Harga</span><span>Rp {{ barang.harga.toLocaleString('id-ID') }}</span></div>
+        <div class="info-line"><span>Harga</span><span>{{ rupiah(barang.harga) }}</span></div>
         <div class="info-line"><span>Jumlah</span><span>{{ barang.jumlah }}</span></div>
-        <div class="info-line"><span>Total</span><span>Rp {{ barang.total.toLocaleString('id-ID') }}</span></div>
+        <div class="info-line"><span>Total</span><span>{{ rupiah(barang.total) }}</span></div>
 
         <div class="flex gap-3 mt-6">
-            <a :href="`/barang/${barang.id_barang}/edit`"
-               class="bg-yellow-500 text-white px-4 py-2 rounded-lg">
-               Edit
-            </a>
-            <a href="/barang"
-               class="bg-gray-400 text-white px-4 py-2 rounded-lg">
-               Kembali
-            </a>
+            <Link :href="`/barang/${barang.id_barang}/edit`"
+                  class="bg-yellow-500 text-white px-4 py-2 rounded-lg">
+                Edit
+            </Link>
+            <Link href="/barang"
+                  class="bg-gray-400 text-white px-4 py-2 rounded-lg">
+                Kembali
+            </Link>
         </div>
     </div>
 </template>

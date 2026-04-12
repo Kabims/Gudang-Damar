@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useForm } from '@inertiajs/vue3';
+import { Link, useForm } from '@inertiajs/vue3';
 
 const props = defineProps<{
     barang: {
@@ -60,10 +60,10 @@ function submit() {
                         class="bg-gradient-to-r from-purple-600 to-blue-500 text-white py-2 rounded-lg font-bold shadow">
                     Simpan Perubahan
                 </button>
-                <a :href="`/barang/${barang.id_barang}`"
-                   class="text-center bg-gradient-to-r from-purple-600 to-blue-500 text-white py-2 rounded-lg font-bold">
-                   Kembali
-                </a>
+                <Link :href="`/barang/${barang.id_barang}`"
+                      class="text-center bg-gradient-to-r from-purple-600 to-blue-500 text-white py-2 rounded-lg font-bold">
+                    Kembali
+                </Link>
             </div>
         </form>
     </main>
