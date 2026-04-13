@@ -102,6 +102,6 @@ class SocialiteController extends Controller
 
         URL::defaults(['current_team' => $team->slug]);
 
-        return redirect()->intended(route('dashboard'));
+        return redirect()->intended(route('barang.index'));
     }
 }
