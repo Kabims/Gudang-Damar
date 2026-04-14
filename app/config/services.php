@@ -40,4 +40,9 @@ return [
         'model' => env('HUGGINGFACE_MODEL', 'black-forest-labs/FLUX.1-schnell'),
     ],
 
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI', '/auth/google/callback'),
+    ],
 ];

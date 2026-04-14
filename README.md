@@ -60,7 +60,17 @@ rename it to .env
 set the value in .env 
 ```
 
-### Step 4. Uncomment this in php.ini
+### Step 4. install
+```
+composer install
+npm install
+```
+### Step 5. Generate app key
+```
+php artisan key:generate
+```
+
+### Step 6. Uncomment this in php.ini
 ```bash
 extension_dir = "ext"
 extension=mbstring
@@ -69,12 +79,12 @@ extension=pdo_pgsql
 extension=pgsql
 ```
 
-### Step 5. Run the Project
+### Step 7. Run the Project
 ```bash
 composer run dev
 ```
 
-### Step 6. Go to Localhost Links to See the Project
+### Step 8. Go to Localhost Links to See the Project
 ```
 Vite = http://localhost:5173/
 

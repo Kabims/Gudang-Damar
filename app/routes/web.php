@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\Teams\TeamInvitationController;
 use App\Http\Middleware\EnsureTeamMembership;
 use App\Services\DatabaseService;
@@ -29,13 +30,17 @@ Route::get('/test', function () {
     return response()->json($data);
 });
 
-
 Route::resource('barang', BarangController::class);
 
-Route::post('/generate-image', [ImageController::class, 'generate']);
- 
-Route::get('/test-image', function () {
-    return view('test-image');
+Route::middleware(['auth'])->group(function () {
+    Route::post('/generate-image', [ImageController::class, 'generate']);
+    Route::get('/test-image', function () {
+        return view('test-image');
+    });
 });
+
+Route::get('/auth/google/redirect', [SocialiteController::class, 'redirect'])->name('auth.google.redirect');
+Route::get('/auth/google/callback', [SocialiteController::class, 'callback'])->name('auth.google.callback');
+
 
 require __DIR__.'/settings.php';
