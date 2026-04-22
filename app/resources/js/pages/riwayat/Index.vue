@@ -182,11 +182,7 @@ const displayTransactions = computed(() => {
                 <nav
                     class="mb-4 flex items-center gap-2 text-xs font-bold tracking-widest text-slate-400 uppercase"
                 >
-                    <a
-                        class="transition-colors hover:text-[#001e40]"
-                        href="/dashboard"
-                        >Dashboard</a
-                    >
+                    <a href="/barang">Penyimpanan</a>
                     <span
                         class="material-symbols-outlined text-[14px]"
                         data-icon="chevron_right"

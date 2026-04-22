@@ -40,18 +40,18 @@ Route::get('/riwayat', function () {
     return inertia('riwayat/Index');
 });
 
-Route::get('/servis',                  [ServisController::class, 'index'])   ->name('servis.index');
-Route::post('/servis',                 [ServisController::class, 'store'])   ->name('servis.store');
-Route::put('/servis/{id}',             [ServisController::class, 'update'])  ->name('servis.update');
-Route::delete('/servis/{id}',          [ServisController::class, 'destroy']) ->name('servis.destroy');
-Route::post('/servis/{id}/selesai',    [ServisController::class, 'selesai']) ->name('servis.selesai');
+Route::get('/servis', [ServisController::class, 'index'])->name('servis.index');
+Route::post('/servis', [ServisController::class, 'store'])->name('servis.store');
+Route::put('/servis/{id}', [ServisController::class, 'update'])->name('servis.update');
+Route::post('/servis/{id}/selesai', [ServisController::class, 'selesai'])->name('servis.selesai');
+Route::delete('/servis/{id}', [ServisController::class, 'destroy'])->name('servis.destroy');
 
-Route::get('/pesanan',                  [PesananController::class, 'index'])   ->name('pesanan.index');
-Route::post('/pesanan',                 [PesananController::class, 'store'])   ->name('pesanan.store');
-Route::get('/pesanan/{id}/edit',        [PesananController::class, 'edit'])    ->name('pesanan.edit');
-Route::put('/pesanan/{id}',             [PesananController::class, 'update'])  ->name('pesanan.update');
-Route::delete('/pesanan/{id}',          [PesananController::class, 'destroy']) ->name('pesanan.destroy');
-Route::post('/pesanan/{id}/selesai',    [PesananController::class, 'selesai']) ->name('pesanan.selesai');
+Route::get('/pesanan', [PesananController::class, 'index'])->name('pesanan.index');
+Route::post('/pesanan', [PesananController::class, 'store'])->name('pesanan.store');
+Route::get('/pesanan/{id}/edit', [PesananController::class, 'edit'])->name('pesanan.edit');
+Route::put('/pesanan/{id}', [PesananController::class, 'update'])->name('pesanan.update');
+Route::post('/pesanan/{id}/selesai', [PesananController::class, 'selesai'])->name('pesanan.selesai');
+Route::delete('/pesanan/{id}', [PesananController::class, 'destroy'])->name('pesanan.destroy');
 
 Route::middleware(['auth'])->group(function () {
     Route::post('/generate-image', [ImageController::class, 'generate']);

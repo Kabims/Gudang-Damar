@@ -1,4 +1,5 @@
 <?php
+// app/Http/Controllers/ServisController.php
 
 namespace App\Http\Controllers;
 
@@ -13,28 +14,35 @@ class ServisController extends Controller
         $servis = Servis::orderBy('tanggalpemesanan', 'desc')->get();
 
         return Inertia::render('servis/Index', [
-            'servis' => $servis,
+            'servisList' => $servis,
         ]);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nama_barang'      => 'required|string|max:255',
-            'bahan'            => 'required|string|max:255',
-            'jumlah'           => 'required|integer|min:1',
-            'tanggalpemesanan' => 'required|date',
-            'tanggalterkirim'  => 'nullable|date|after_or_equal:tanggalpemesanan',
-            'bentuk_barang'    => 'required|integer',
+            'nama_barang'   => 'required|string|max:255',
+            'bahan'         => 'required|string|max:255',
+            'jumlah'        => 'nullable|integer|min:1',
+            'bentuk_barang' => 'nullable|integer|min:1',
+            'catatan'       => 'required|string|max:1000',
         ], [
-            'nama_barang.required'      => 'Nama barang harus diisi.',
-            'bahan.required'            => 'Bahan harus diisi.',
-            'jumlah.required'           => 'Jumlah harus diisi.',
-            'jumlah.min'                => 'Jumlah minimal 1.',
-            'tanggalpemesanan.required' => 'Tanggal pemesanan harus diisi.',
-            'tanggalterkirim.after_or_equal' => 'Tanggal terkirim tidak boleh sebelum tanggal pemesanan.',
-            'bentuk_barang.required'    => 'Bentuk barang harus diisi.',
+            'nama_barang.required' => 'Nama barang harus diisi.',
+            'bahan.required'       => 'Bahan harus diisi.',
+            'catatan.required'     => 'Catatan servis wajib diisi.',
+            'catatan.max'          => 'Catatan maksimal 1000 karakter.',
         ]);
+
+        // Default values
+        $validated['jumlah']        = $validated['jumlah']        ?? 1;
+        $validated['bentuk_barang'] = $validated['bentuk_barang'] ?? 0;
+
+        // Tanggal pemesanan = sekarang
+        $validated['tanggalpemesanan'] = now();
+
+        // ✨ tanggalterkirim diisi dengan sentinel date (1970-01-01)
+        // untuk menandai "belum selesai" karena kolom NOT NULL
+        $validated['tanggalterkirim'] = '1970-01-01 00:00:00';
 
         Servis::create($validated);
 
@@ -47,13 +55,15 @@ class ServisController extends Controller
         $servis = Servis::findOrFail($id);
 
         $validated = $request->validate([
-            'nama_barang'      => 'required|string|max:255',
-            'bahan'            => 'required|string|max:255',
-            'jumlah'           => 'required|integer|min:1',
-            'tanggalpemesanan' => 'required|date',
-            'tanggalterkirim'  => 'nullable|date|after_or_equal:tanggalpemesanan',
-            'bentuk_barang'    => 'required|integer',
+            'nama_barang'   => 'required|string|max:255',
+            'bahan'         => 'required|string|max:255',
+            'jumlah'        => 'nullable|integer|min:1',
+            'bentuk_barang' => 'nullable|integer|min:1',
+            'catatan'       => 'required|string|max:1000',
         ]);
+
+        $validated['jumlah']        = $validated['jumlah']        ?? 1;
+        $validated['bentuk_barang'] = $validated['bentuk_barang'] ?? 0;
 
         $servis->update($validated);
 
@@ -61,12 +71,33 @@ class ServisController extends Controller
             ->with('success', 'Data servis berhasil diperbarui.');
     }
 
-    public function destroy($id)
+    public function selesai($id)
     {
         $servis = Servis::findOrFail($id);
-        $servis->delete();
+
+        $servis->update([
+            'tanggalterkirim' => now(),
+        ]);
 
         return redirect()->route('servis.index')
-            ->with('success', 'Data servis berhasil dihapus.');
+            ->with('success', 'Servis berhasil ditandai selesai.');
+    }
+
+    public function destroy($id)
+    {
+        $pesanan = Pesanan::findOrFail($id);
+
+        // Cek apakah ada servis yang terkait
+        $servisTerkait = Servis::where('id_pesanan', $id)->exists();
+        
+        if ($servisTerkait) {
+            return redirect()->route('pesanan.index')
+                ->with('error', 'Tidak bisa hapus pesanan ini karena masih ada data servis yang terkait.');
+        }
+
+        $pesanan->delete();
+
+        return redirect()->route('pesanan.index')
+            ->with('success', 'Pesanan berhasil dihapus!');
     }
 }
