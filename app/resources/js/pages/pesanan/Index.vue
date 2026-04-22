@@ -1,7 +1,7 @@
 <script setup>
-import { router, Link } from '@inertiajs/vue3';
-import { ref, reactive } from 'vue';
-import Navbar from '@/components/Navbar.vue';
+import { router, Link } from '@inertiajs/vue3'
+import { ref, reactive } from 'vue'
+import Navbar from '@/components/Navbar.vue'
 
 const props = defineProps({
   pesananList: {
@@ -29,17 +29,14 @@ const resetForm = () => {
 }
 
 const formatDate = (dateString) => {
-  if (!dateString) {
-return '-'
-}
-
-  const date = new Date(dateString);
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = date.getFullYear();
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  return `${day}-${month}-${year} ${hours}:${minutes}`;
+  if (!dateString) return '-'
+  const date = new Date(dateString)
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const year = date.getFullYear()
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  return `${day}-${month}-${year} ${hours}:${minutes}`
 }
 
 // ── Modal ────────────────────────────────────────────────────
@@ -62,7 +59,7 @@ const submitForm = () => {
 
 // ── Actions ──────────────────────────────────────────────────
 const tandaiTerkirim = (id) => {
-  if (confirm('Tandai pesanan ini sebagai terkirim?')) {
+  if (confirm('Tandai pesanan ini sebagai Selesai?')) {
     router.post(`/pesanan/${id}/selesai`)
   }
 }
@@ -80,22 +77,21 @@ const hapusPesanan = (id) => {
 
     <main class="pesanan-main">
       <!-- Header -->
-      <!-- Header -->
-    <div class="pesanan-header">
-      <div class="header-text">
-        <nav class="breadcrumb">
-          <a href="/dashboard">Dashboard</a>
-          <span class="bc-sep">/</span>
-          <span class="bc-active">Data Pesanan</span>
-        </nav>
-        <h1 class="page-title">Data Pesanan</h1>
-        <p class="page-subtitle">Menampilkan seluruh data pesanan barang gudang.</p>
+      <div class="pesanan-header">
+        <div class="header-text">
+          <nav class="breadcrumb">
+            <a href="/barang">Penyimpanan</a>
+            <span class="bc-sep">/</span>
+            <span class="bc-active">Data Pesanan</span>
+          </nav>
+          <h1 class="page-title">Data Pesanan</h1>
+          <p class="page-subtitle">Menampilkan seluruh data pesanan barang gudang.</p>
+        </div>
+        <button class="btn-tambah-header" @click="openTambah">
+          <span class="material-symbols-outlined btn-icon">add_circle</span>
+          Tambah Pesanan
+        </button>
       </div>
-      <button class="btn-tambah-header" @click="openTambah">
-        <span class="material-symbols-outlined btn-icon">add_circle</span>
-        Tambah Pesanan
-      </button>
-    </div>
 
       <!-- Summary Cards -->
       <div class="summary-row">
@@ -113,7 +109,7 @@ const hapusPesanan = (id) => {
             <span class="material-symbols-outlined">hourglass_empty</span>
           </div>
           <div>
-            <p class="summary-label">Belum Terkirim</p>
+            <p class="summary-label">Belum Selesai</p>
             <h3 class="summary-value">{{ pesananList.filter(p => !p.tanggalterkirim).length }}</h3>
           </div>
         </div>
@@ -122,85 +118,115 @@ const hapusPesanan = (id) => {
             <span class="material-symbols-outlined">local_shipping</span>
           </div>
           <div>
-            <p class="summary-label">Terkirim</p>
+            <p class="summary-label">Selesai</p>
             <h3 class="summary-value">{{ pesananList.filter(p => p.tanggalterkirim).length }}</h3>
           </div>
         </div>
       </div>
 
-      <!-- Order Cards List (Main Section) -->
-      <div class="flex flex-col gap-4 mt-6">
-        <div v-for="p in pesananList" :key="p.id_pesanan"
-             class="bg-white rounded-xl p-4.5 border flex flex-col gap-3.5 shadow-lg relative group transition-colors"
-             :class="[
-               p.tanggalterkirim ? 'border-outline-variant/15 hover:border-outline-variant/30 opacity-90' : 'border-error-container/50 hover:border-error-container'
-             ]">
-          
-          <div v-if="!p.tanggalterkirim" class="absolute left-0 top-4 bottom-4 w-1 bg-error rounded-r-full"></div>
+      <!-- List Pesanan (Card-based) -->
+      <div class="pesanan-list">
+        <div
+          v-for="p in pesananList"
+          :key="p.id_pesanan"
+          class="pesanan-card"
+          :class="{ 'is-pending': !p.tanggalterkirim }"
+        >
+          <!-- Left indicator bar untuk pending -->
+          <div v-if="!p.tanggalterkirim" class="indicator-bar"></div>
 
           <!-- Card Header -->
-          <div class="bg-white rounded-xl shadow" :class="{ 'pl-2': !p.tanggalterkirim }">
-            <div class="bg-white rounded-t-xl p-2">
-              <span class="font-label text-[15px] font-black text-primary tracking-wide">
-                {{ String(p.id_pesanan).padStart(6, '0') }} - {{ p.nama_barang }}
-              </span>
-              <div class="flex items-center gap-1 text-[11px] font-label tracking-wide"
-                   :class="!p.tanggalterkirim ? 'text-error font-bold' : 'text-on-surface-variant'">
-                <span class="material-symbols-outlined text-[12px]">{{ !p.tanggalterkirim ? 'warning' : 'schedule' }}</span>
-                {{ p.tanggalpemesanan ? formatDate(p.tanggalpemesanan) : 'Belum' }}
-                <template v-if="p.tanggalterkirim">
-                  <span class="mx-1">•</span>
-                  <span class="material-symbols-outlined text-[12px]">local_shipping</span>
-                  {{ formatDate(p.tanggalterkirim) }}
-                </template>
-              </div>
+          <div class="card-header">
+            <div class="card-title-group">
+              <span class="card-id">{{ String(p.id_pesanan).padStart(6, '0') }}</span>
+              <span class="card-sep">•</span>
+              <span class="card-title">{{ p.nama_barang }}</span>
             </div>
-            <div v-if="!p.tanggalterkirim" class="inline-flex bg-red-100 text-red-700 rounded-full px-2.5 py-1 text-[10px] font-label font-bold uppercase tracking-widest flex items-center gap-1 shadow-sm">
-              <span class="material-symbols-outlined text-[14px]">pending_actions</span>
-              BELUM
+
+            <!-- Status badge -->
+            <div v-if="!p.tanggalterkirim" class="status-badge badge-pending">
+              <span class="material-symbols-outlined">pending_actions</span>
+              BELUM SELESAI
             </div>
-            <div v-else class="inline-flex bg-green-100 text-green-700 rounded-full px-2.5 py-1 text-[10px] font-label font-bold uppercase tracking-widest items-center gap-1 shadow-sm">
-              <span class="material-symbols-outlined text-[14px]">local_shipping</span>
-              TERKIRIM
+            <div v-else class="status-badge badge-terkirim">
+              <span class="material-symbols-outlined">local_shipping</span>
+              Selesai
             </div>
           </div>
 
-          <!-- Card Body (Notes) -->
-          <div class="bg-surface-container-low rounded-lg p-3 border border-outline-variant/10" :class="{ 'ml-2': !p.tanggalterkirim }">
-            <div class="text-[13px] text-on-surface-variant font-body mb-2">
-              <strong>Bahan:</strong> {{ p.bahan }} <span class="mx-2">|</span> <strong>Jumlah:</strong> {{ p.jumlah }}
+          <!-- Timeline -->
+          <div class="timeline">
+            <div class="timeline-item">
+              <span class="material-symbols-outlined">schedule</span>
+              <span class="timeline-label">Dipesan:</span>
+              <span class="timeline-date">{{ formatDate(p.tanggalpemesanan) }}</span>
             </div>
-            <p v-if="p.catatan" class="text-[13px] text-on-surface-variant font-body line-clamp-2 leading-relaxed">
-              {{ p.catatan }}
-            </p>
-            <p v-else class="text-[13px] text-on-surface-variant font-body italic opacity-50">
-              Tidak ada catatan khusus.
-            </p>
+            <div v-if="p.tanggalterkirim" class="timeline-item">
+              <span class="material-symbols-outlined">check_circle</span>
+              <span class="timeline-label">Terkirim:</span>
+              <span class="timeline-date">{{ formatDate(p.tanggalterkirim) }}</span>
+            </div>
+          </div>
+
+          <!-- Info Box -->
+          <div class="info-box">
+            <div class="info-row">
+              <div class="info-item">
+                <span class="info-label">Bahan</span>
+                <span class="info-value">{{ p.bahan }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Jumlah</span>
+                <span class="info-value">{{ p.jumlah }}</span>
+              </div>
+            </div>
+
+            <div class="catatan-section">
+              <span class="info-label">Catatan</span>
+              <p v-if="p.catatan" class="catatan-text">{{ p.catatan }}</p>
+              <p v-else class="catatan-empty">Tidak ada catatan khusus.</p>
+            </div>
           </div>
 
           <!-- Card Actions -->
-          <div class="flex justify-end gap-2 pt-1 border-t border-gray-200 bg-white rounded-b-xl transition-colors">
-            <button v-if="!p.tanggalterkirim" class="p-2 rounded-DEFAULT text-secondary bg-surface hover:bg-secondary-container/30 transition-colors flex items-center justify-center group/btn" title="Tandai Terkirim" @click="tandaiTerkirim(p.id_pesanan)">
-              <span class="material-symbols-outlined text-[20px] group-hover/btn:scale-110 transition-transform">check_circle</span>
+          <div class="card-actions">
+            <button
+              v-if="!p.tanggalterkirim"
+              class="btn-action btn-kirim"
+              title="Tandai Terkirim"
+              @click="tandaiTerkirim(p.id_pesanan)"
+            >
+              <span class="material-symbols-outlined">check_circle</span>
+              Tandai Selesai
             </button>
-            <Link :href="`/pesanan/${p.id_pesanan}/edit`" class="p-2 rounded-DEFAULT text-on-surface-variant bg-surface hover:bg-surface-container transition-colors flex items-center justify-center group/btn" title="Edit">
-              <span class="material-symbols-outlined text-[20px] group-hover/btn:scale-110 transition-transform">edit_square</span>
+            <Link
+              :href="`/pesanan/${p.id_pesanan}/edit`"
+              class="btn-action btn-edit"
+              title="Edit"
+            >
+              <span class="material-symbols-outlined">edit_square</span>
+              Edit
             </Link>
-            <button class="p-2 rounded-DEFAULT text-error bg-surface hover:bg-error-container/30 transition-colors flex items-center justify-center group/btn" title="Hapus" @click="hapusPesanan(p.id_pesanan)">
-              <span class="material-symbols-outlined text-[20px] group-hover/btn:scale-110 transition-transform">delete</span>
+            <button
+              class="btn-action btn-hapus"
+              title="Hapus"
+              @click="hapusPesanan(p.id_pesanan)"
+            >
+              <span class="material-symbols-outlined">delete</span>
+              Hapus
             </button>
           </div>
         </div>
 
         <!-- Empty State -->
-        <div v-if="pesananList.length === 0" class="text-center p-10 text-on-surface-variant opacity-50 border border-dashed border-outline-variant/30 rounded-xl">
-          <span class="material-symbols-outlined text-4xl mb-2">inbox</span>
+        <div v-if="pesananList.length === 0" class="empty-state">
+          <span class="material-symbols-outlined empty-icon">inbox</span>
           <p>Belum ada data pesanan.</p>
         </div>
       </div>
     </main>
 
-    <!-- ── Modal Tambah / Edit ─────────────────────────────── -->
+    <!-- ── Modal Tambah ───────────────────────────────────── -->
     <Teleport to="body">
       <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
         <div class="modal-card" @click.stop>
@@ -213,7 +239,6 @@ const hapusPesanan = (id) => {
           </div>
 
           <form @submit.prevent="submitForm" class="modal-form">
-
             <div class="form-group">
               <label>Nama Barang</label>
               <input
@@ -261,7 +286,6 @@ const hapusPesanan = (id) => {
                 Tambah Pesanan
               </button>
             </div>
-
           </form>
         </div>
       </div>
@@ -279,7 +303,9 @@ const hapusPesanan = (id) => {
   min-height: 100vh;
   background: #f0f2f5;
   font-family: 'Inter', sans-serif;
+  color: #000;
 }
+
 .pesanan-main {
   flex: 1;
   padding: 36px 28px;
@@ -298,6 +324,7 @@ const hapusPesanan = (id) => {
   flex-wrap: wrap;
   gap: 16px;
 }
+
 .breadcrumb {
   display: flex;
   align-items: center;
@@ -311,12 +338,13 @@ const hapusPesanan = (id) => {
 }
 .breadcrumb a { color: #94a3b8; text-decoration: none; transition: color .2s; }
 .breadcrumb a:hover { color: #001e40; }
-.bc-arrow { font-size: 14px !important; }
+.bc-sep { color: #94a3b8; padding: 0 4px; }
 .bc-active { color: #001e40; }
+
 .page-title {
   font-size: 2rem;
   font-weight: 800;
-  color: #001e40;
+  color: #000;
   letter-spacing: -0.02em;
   margin: 0;
 }
@@ -325,6 +353,7 @@ const hapusPesanan = (id) => {
   font-size: 1rem;
   margin: 4px 0 0;
 }
+
 .btn-tambah-header {
   display: flex;
   align-items: center;
@@ -352,6 +381,7 @@ const hapusPesanan = (id) => {
   gap: 20px;
   margin-bottom: 28px;
 }
+
 .summary-card {
   background: #fff;
   border-radius: 14px;
@@ -363,155 +393,380 @@ const hapusPesanan = (id) => {
   transition: box-shadow .3s;
 }
 .summary-card:hover { box-shadow: 0 8px 32px rgba(0,30,64,.1); }
+
 .summary-icon {
-  width: 48px; height: 48px;
+  width: 48px;
+  height: 48px;
   border-radius: 12px;
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
 .summary-icon.blue   { background: #dbeafe; color: #2563eb; }
 .summary-icon.orange { background: #ffedd5; color: #ea580c; }
 .summary-icon.green  { background: #dcfce7; color: #16a34a; }
 .summary-icon .material-symbols-outlined { font-size: 24px; }
+
 .summary-label {
-  font-size: 11px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: .12em;
-  color: #94a3b8; margin: 0 0 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: #64748b;
+  margin: 0 0 4px;
 }
 .summary-value {
-  font-size: 1.75rem; font-weight: 800;
-  color: #001e40; margin: 0;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #000;
+  margin: 0;
 }
 
-/* ── Table ────────────────────────────────────────────────── */
-.table-wrapper {
+/* ── Pesanan List ─────────────────────────────────────────── */
+.pesanan-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.pesanan-card {
+  position: relative;
   background: #fff;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 4px 24px rgba(0,30,64,.05);
+  border-radius: 14px;
+  padding: 20px 22px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0,0,0,.04);
+  transition: box-shadow .2s, border-color .2s;
 }
-.table-scroll { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; }
-thead tr { background: #f8fafc; border-bottom: 2px solid #e2e8f0; }
-th {
-  padding: 14px 18px;
-  font-size: 10px; font-weight: 800;
-  letter-spacing: .14em; text-transform: uppercase;
-  color: #64748b; text-align: left; white-space: nowrap;
+.pesanan-card:hover {
+  box-shadow: 0 6px 20px rgba(0,0,0,.08);
 }
-.th-aksi { text-align: center; }
-tbody tr { border-bottom: 1px solid #f1f5f9; transition: background .15s; }
-tbody tr:hover { background: #f8fafc; }
-td {
-  padding: 16px 18px;
-  font-size: 14px; color: #334155;
-  vertical-align: middle;
+.pesanan-card.is-pending {
+  border-color: #fecaca;
+  padding-left: 26px;
 }
-.td-no { font-weight: 700; color: #94a3b8; width: 50px; }
-.td-jumlah { font-weight: 700; color: #001e40; }
-.td-catatan { max-width: 200px; }
-.catatan-text { color: #475569; font-size: 13px; }
-.td-empty-val { color: #cbd5e1; }
 
-.nama-cell { display: flex; align-items: center; gap: 10px; }
-.nama-icon {
-  width: 36px; height: 36px;
-  border-radius: 8px; background: #f1f5f9;
-  display: flex; align-items: center; justify-content: center;
-  color: #475569; flex-shrink: 0;
+.indicator-bar {
+  position: absolute;
+  left: 0;
+  top: 20px;
+  bottom: 20px;
+  width: 4px;
+  background: #dc2626;
+  border-radius: 0 4px 4px 0;
 }
-.nama-icon .material-symbols-outlined { font-size: 18px; }
-.td-nama span { font-weight: 600; color: #001e40; }
 
-.belum-tag {
-  font-size: 12px;
+/* Card Header */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.card-title-group {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.card-id {
+  font-size: 13px;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: .04em;
+  font-family: 'Consolas', monospace;
+}
+
+.card-sep {
+  color: #cbd5e1;
+  font-weight: 700;
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #000;
+}
+
+/* Status Badge */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  white-space: nowrap;
+}
+.status-badge .material-symbols-outlined {
+  font-size: 14px;
+}
+.badge-pending {
+  background: #fee2e2;
+  color: #991b1b;
+}
+.badge-terkirim {
+  background: #dcfce7;
+  color: #166534;
+}
+
+/* Timeline */
+.timeline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px dashed #e5e7eb;
+}
+
+.timeline-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #000;
+}
+.timeline-item .material-symbols-outlined {
+  font-size: 16px;
+  color: #64748b;
+}
+
+.timeline-label {
+  font-weight: 600;
+  color: #64748b;
+}
+
+.timeline-date {
+  color: #000;
+  font-weight: 500;
+}
+
+/* Info Box */
+.info-box {
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+}
+
+.info-row {
+  display: flex;
+  gap: 28px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.info-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: #64748b;
+}
+
+.info-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #000;
+}
+
+.catatan-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.catatan-text {
+  margin: 0;
+  font-size: 13px;
+  color: #000;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.catatan-empty {
+  margin: 0;
+  font-size: 13px;
   color: #94a3b8;
   font-style: italic;
 }
 
-/* ── Badge ────────────────────────────────────────────────── */
-.badge {
-  display: inline-block;
-  padding: 4px 14px;
-  border-radius: 999px;
-  font-size: 11px; font-weight: 700;
-  letter-spacing: .06em; text-transform: uppercase;
-  white-space: nowrap;
+/* Card Actions */
+.card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
 }
-.badge-terkirim { background: #dcfce7; color: #15803d; }
-.badge-pending  { background: #fef3c7; color: #b45309; }
 
-/* ── Action Buttons ───────────────────────────────────────── */
-.aksi-group { display: flex; justify-content: center; gap: 6px; }
-.btn-aksi {
-  width: 34px; height: 34px;
-  border-radius: 8px; border: none; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: transform .15s, box-shadow .15s;
+.btn-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1.5px solid transparent;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform .15s, box-shadow .15s, background .15s;
 }
-.btn-aksi:hover { transform: scale(1.1); }
-.btn-aksi .material-symbols-outlined { font-size: 18px; }
-.btn-kirim { background: #dcfce7; color: #16a34a; }
-.btn-kirim:hover { box-shadow: 0 4px 12px rgba(22,163,74,.3); }
-.btn-edit  { background: #dbeafe; color: #2563eb; }
-.btn-edit:hover { box-shadow: 0 4px 12px rgba(37,99,235,.3); }
-.btn-hapus { background: #fee2e2; color: #dc2626; }
-.btn-hapus:hover { box-shadow: 0 4px 12px rgba(220,38,38,.3); }
+.btn-action .material-symbols-outlined {
+  font-size: 16px;
+}
+.btn-action:hover {
+  transform: translateY(-1px);
+}
 
-.td-empty {
+.btn-kirim {
+  background: #dcfce7;
+  color: #166534;
+  border-color: #bbf7d0;
+}
+.btn-kirim:hover {
+  background: #bbf7d0;
+  box-shadow: 0 4px 10px rgba(22,163,74,.2);
+}
+
+.btn-edit {
+  background: #dbeafe;
+  color: #1e40af;
+  border-color: #bfdbfe;
+}
+.btn-edit:hover {
+  background: #bfdbfe;
+  box-shadow: 0 4px 10px rgba(37,99,235,.2);
+}
+
+.btn-hapus {
+  background: #fee2e2;
+  color: #991b1b;
+  border-color: #fecaca;
+}
+.btn-hapus:hover {
+  background: #fecaca;
+  box-shadow: 0 4px 10px rgba(220,38,38,.2);
+}
+
+/* Empty State */
+.empty-state {
   text-align: center;
-  padding: 60px 20px !important;
+  padding: 60px 20px;
   color: #94a3b8;
+  background: #fff;
+  border: 2px dashed #e5e7eb;
+  border-radius: 14px;
 }
-.empty-icon { font-size: 48px !important; margin-bottom: 8px; display: block; }
-.td-empty p { margin: 8px 0 0; font-size: 15px; }
+.empty-icon {
+  font-size: 48px !important;
+  margin-bottom: 8px;
+  display: block;
+}
+.empty-state p {
+  margin: 8px 0 0;
+  font-size: 15px;
+}
 
 /* ── Modal ────────────────────────────────────────────────── */
 .modal-overlay {
-  position: fixed; inset: 0; z-index: 9999;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
   background: rgba(0,0,0,.45);
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   animation: fadeIn .2s ease;
 }
+
 .modal-card {
-  background: #fff; border-radius: 20px;
-  width: 540px; max-width: 92vw; max-height: 90vh;
+  background: #fff;
+  border-radius: 20px;
+  width: 540px;
+  max-width: 92vw;
+  max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 24px 64px rgba(0,0,0,.18);
   animation: slideUp .25s ease;
+  color: #000;
 }
+
 @keyframes fadeIn  { from { opacity: 0 } to { opacity: 1 } }
 @keyframes slideUp { from { opacity: 0; transform: translateY(24px) } to { opacity: 1; transform: translateY(0) } }
 
 .modal-header {
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 24px 28px 0;
 }
 .modal-header h2 {
-  font-size: 1.25rem; font-weight: 800; color: #001e40; margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #000;
+  margin: 0;
 }
 .modal-close {
-  background: #f1f5f9; border: none; border-radius: 10px;
-  width: 36px; height: 36px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  color: #64748b; transition: background .15s;
+  background: #f1f5f9;
+  border: none;
+  border-radius: 10px;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  transition: background .15s;
 }
 .modal-close:hover { background: #e2e8f0; }
+
 .modal-form { padding: 24px 28px 28px; }
 
 .form-group { margin-bottom: 18px; }
 .form-group label {
-  display: block; font-size: 12px; font-weight: 700;
-  color: #475569; margin-bottom: 6px;
-  text-transform: uppercase; letter-spacing: .06em;
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: #000;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
 }
-.label-opt { font-weight: 400; text-transform: none; font-size: 11px; color: #94a3b8; }
+.label-opt {
+  font-weight: 400;
+  text-transform: none;
+  font-size: 11px;
+  color: #94a3b8;
+}
+
 .form-group input,
 .form-group textarea {
-  width: 100%; padding: 12px 14px;
-  border: 1.5px solid #e2e8f0; border-radius: 10px;
-  font-size: 14px; font-family: inherit;
-  background: #f8fafc; resize: vertical;
+  color: #000;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  background: #f8fafc;
+  resize: vertical;
   transition: border-color .2s, box-shadow .2s;
   box-sizing: border-box;
 }
@@ -522,24 +777,46 @@ td {
   box-shadow: 0 0 0 3px rgba(0,110,37,.12);
   background: #fff;
 }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
 
 .modal-actions {
-  display: flex; justify-content: flex-end; gap: 12px; margin-top: 8px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
 }
+
 .btn-batal {
-  padding: 12px 24px; border-radius: 10px;
-  border: 1.5px solid #e2e8f0; background: #fff;
-  color: #64748b; font-weight: 600; font-size: 14px;
-  cursor: pointer; transition: background .15s;
+  padding: 12px 24px;
+  border-radius: 10px;
+  border: 1.5px solid #e2e8f0;
+  background: #fff;
+  color: #64748b;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background .15s;
 }
 .btn-batal:hover { background: #f1f5f9; }
+
 .btn-simpan {
-  display: flex; align-items: center; gap: 8px;
-  padding: 12px 24px; border-radius: 10px; border: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 10px;
+  border: none;
   background: linear-gradient(135deg, #006e25, #00a63e);
-  color: #fff; font-weight: 700; font-size: 14px;
-  cursor: pointer; box-shadow: 0 6px 16px rgba(0,110,37,.2);
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(0,110,37,.2);
   transition: transform .15s, box-shadow .15s;
 }
 .btn-simpan:hover {
@@ -550,8 +827,11 @@ td {
 
 /* ── Footer ───────────────────────────────────────────────── */
 footer {
-  background-color: #222; color: white;
-  padding: 12px; text-align: center; font-size: 14px;
+  background-color: #222;
+  color: white;
+  padding: 12px;
+  text-align: center;
+  font-size: 14px;
 }
 
 /* ── Responsive ───────────────────────────────────────────── */
@@ -559,6 +839,9 @@ footer {
   .summary-row    { grid-template-columns: 1fr; }
   .pesanan-header { flex-direction: column; align-items: flex-start; }
   .form-row       { grid-template-columns: 1fr; }
+  .info-row       { gap: 14px; }
+  .card-actions   { justify-content: stretch; }
+  .btn-action     { flex: 1; justify-content: center; }
 }
 
 .material-symbols-outlined {

@@ -76,9 +76,16 @@ function hapus(id: number) {
 </script>
 
 <template>
+    <div class="min-h-screen bg-gray-50">
     <Navbar />
     
     <div class="max-w-7xl mx-auto mt-10 px-4">
+          <h1 class="text-2xl md:text-3xl font-bold text-gray-800">
+                        📦 List Barang
+                    </h1>
+                    <p class="text-sm text-gray-500">
+                        Kelola semua barang dengan mudah
+                    </p>
         <h1 class="text-2xl font-bold mb-5">List Barang</h1>
 
         <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mb-4">
@@ -135,7 +142,7 @@ function hapus(id: number) {
                         </td>
                     </tr>
                     <tr v-for="b in filteredList" :key="b.id_barang"
-                        class="border-t text-center hover:bg-gray-50">
+                        class="border-t text-center hover:bg-gray-50 text-black">
                         <td class="p-3">{{ b.nama }}</td>
                         <td class="p-3">{{ b.guna_merek }}</td>
                         <td class="p-3">{{ b.ukuran }}</td>
@@ -167,5 +174,6 @@ function hapus(id: number) {
                 ({{ sortDir === 'asc' ? 'A-Z' : 'Z-A' }})
             </span>
         </div>
+    </div>
     </div>
 </template>

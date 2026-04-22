@@ -1,14 +1,16 @@
 <?php
+// app/Models/Pesanan.php
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Pesanan extends Model
 {
     protected $table      = 'pesanan';
     protected $primaryKey = 'id_pesanan';
-    public $incrementing  = false;   // manual increment
+    public $incrementing  = false;   // PK tidak auto-increment di DB
     protected $keyType    = 'int';
     public $timestamps    = false;
 
@@ -25,9 +27,29 @@ class Pesanan extends Model
     ];
 
     protected $casts = [
+        'id_pesanan'       => 'integer',
+        'id_barang'        => 'integer',
+        'id_user'          => 'integer',
+        'jumlah'           => 'integer',
         'tanggalpemesanan' => 'datetime',
         'tanggalterkirim'  => 'datetime',
     ];
+
+    /**
+     * ✨ Auto-generate id_pesanan saat create
+     * Ambil ID terbesar yang ada, lalu +1
+     */
+    protected static function booted()
+    {
+        static::creating(function ($pesanan) {
+            if (empty($pesanan->id_pesanan)) {
+                $maxId = static::max('id_pesanan') ?? 0;
+                $pesanan->id_pesanan = $maxId + 1;
+            }
+        });
+    }
+
+    // ── Relasi ──────────────────────────────────────────────
 
     public function barang()
     {

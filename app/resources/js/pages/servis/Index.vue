@@ -14,21 +14,23 @@ const props = defineProps({
 // ── State modal ──────────────────────────────────────────────
 const showModal  = ref(false)
 const isEditing  = ref(false)
-const editId     = ref(null)   // menyimpan id_servis (PK)
+const editId     = ref(null)
 
 const form = reactive({
   nama_barang:   '',
   bahan:         '',
-  jumlah:        1,
-  bentuk_barang: 1,
+  jumlah:        null,
+  bentuk_barang: null,
+  catatan:       '',
 })
 
 // ── Helper ───────────────────────────────────────────────────
 const resetForm = () => {
   form.nama_barang   = ''
   form.bahan         = ''
-  form.jumlah        = 1
-  form.bentuk_barang = 1
+  form.jumlah        = null
+  form.bentuk_barang = null
+  form.catatan       = ''
   isEditing.value    = false
   editId.value       = null
 }
@@ -40,13 +42,14 @@ const openTambah = () => {
 }
 
 const openEdit = (servis) => {
-  isEditing.value        = true
-  editId.value           = servis.id_servis   // ← gunakan id_servis (PK baru)
-  form.nama_barang       = servis.nama_barang
-  form.bahan             = servis.bahan
-  form.jumlah            = servis.jumlah
-  form.bentuk_barang     = servis.bentuk_barang
-  showModal.value        = true
+  isEditing.value    = true
+  editId.value       = servis.id_servis
+  form.nama_barang   = servis.nama_barang
+  form.bahan         = servis.bahan
+  form.jumlah        = servis.jumlah || null
+  form.bentuk_barang = servis.bentuk_barang || null
+  form.catatan       = servis.catatan ?? ''
+  showModal.value    = true
 }
 
 const closeModal = () => {
@@ -70,22 +73,28 @@ const submitForm = () => {
 // ── Selesai ──────────────────────────────────────────────────
 const selesaiServis = (id) => {
   if (confirm('Tandai servis ini sebagai selesai?')) {
-    router.post(`/servis/${id}/selesai`)   // id = id_servis
+    router.post(`/servis/${id}/selesai`)
   }
 }
 
 // ── Hapus ────────────────────────────────────────────────────
 const hapusServis = (id) => {
   if (confirm('Yakin ingin menghapus data servis ini?')) {
-    router.delete(`/servis/${id}`)         // id = id_servis
+    router.delete(`/servis/${id}`)
   }
+}
+
+// ── Cek apakah servis belum selesai ──────────────────────────
+// Handle null atau sentinel date (1970-01-01)
+const isBelumSelesai = (dateString) => {
+  if (!dateString) return true
+  const date = new Date(dateString)
+  return date.getFullYear() <= 1970
 }
 
 // ── Format tanggal ───────────────────────────────────────────
 const formatDate = (dateString) => {
-  if (!dateString) {
-return '-'
-}
+  if (!dateString) return '-'
 
   return new Date(dateString).toLocaleDateString('id-ID', {
     day:    '2-digit',
@@ -94,6 +103,18 @@ return '-'
     hour:   '2-digit',
     minute: '2-digit',
   })
+}
+
+// ── Format tanggal kirim (handle sentinel date) ──────────────
+const formatTanggalKirim = (dateString) => {
+  if (isBelumSelesai(dateString)) return '-'
+  return formatDate(dateString)
+}
+
+// ── Truncate catatan untuk tampilan tabel ────────────────────
+const truncate = (text, maxLength = 40) => {
+  if (!text) return '-'
+  return text.length > maxLength ? text.substring(0, maxLength) + '...' : text
 }
 </script>
 
@@ -106,7 +127,7 @@ return '-'
       <div class="servis-header">
         <div>
           <nav class="breadcrumb">
-            <a href="/dashboard">Dashboard</a>
+            <a href="/barang">Penyimpanan</a>
             <span class="material-symbols-outlined bc-arrow">chevron_right</span>
             <span class="bc-active">Data Servis</span>
           </nav>
@@ -136,7 +157,9 @@ return '-'
           </div>
           <div>
             <p class="summary-label">Dalam Proses</p>
-            <h3 class="summary-value">{{ servisList.filter(s => !s.tanggalterkirim).length }}</h3>
+            <h3 class="summary-value">
+              {{ servisList.filter(s => isBelumSelesai(s.tanggalterkirim)).length }}
+            </h3>
           </div>
         </div>
         <div class="summary-card">
@@ -145,7 +168,9 @@ return '-'
           </div>
           <div>
             <p class="summary-label">Selesai</p>
-            <h3 class="summary-value">{{ servisList.filter(s => s.tanggalterkirim).length }}</h3>
+            <h3 class="summary-value">
+              {{ servisList.filter(s => !isBelumSelesai(s.tanggalterkirim)).length }}
+            </h3>
           </div>
         </div>
       </div>
@@ -161,6 +186,7 @@ return '-'
                 <th>Bahan</th>
                 <th>Jumlah</th>
                 <th>Bentuk</th>
+                <th>Catatan</th>
                 <th>Tgl Pemesanan</th>
                 <th>Tgl Selesai</th>
                 <th>Status</th>
@@ -179,23 +205,25 @@ return '-'
                   </div>
                 </td>
                 <td>{{ servis.bahan }}</td>
-                <td class="td-jumlah">{{ servis.jumlah }}</td>
-                <td>{{ servis.bentuk_barang }}</td>
+                <td class="td-jumlah">{{ servis.jumlah || '-' }}</td>
+                <td>{{ servis.bentuk_barang || '-' }}</td>
+                <td class="td-catatan" :title="servis.catatan">
+                  {{ truncate(servis.catatan) }}
+                </td>
                 <td>{{ formatDate(servis.tanggalpemesanan) }}</td>
-                <td>{{ formatDate(servis.tanggalterkirim) }}</td>
+                <td>{{ formatTanggalKirim(servis.tanggalterkirim) }}</td>
                 <td>
                   <span
                     class="badge"
-                    :class="servis.tanggalterkirim ? 'badge-selesai' : 'badge-proses'"
+                    :class="!isBelumSelesai(servis.tanggalterkirim) ? 'badge-selesai' : 'badge-proses'"
                   >
-                    {{ servis.tanggalterkirim ? 'Selesai' : 'Dalam Proses' }}
+                    {{ !isBelumSelesai(servis.tanggalterkirim) ? 'Selesai' : 'Dalam Proses' }}
                   </span>
                 </td>
                 <td>
                   <div class="aksi-group">
-                    <!-- Tombol selesai hanya muncul jika belum selesai -->
                     <button
-                      v-if="!servis.tanggalterkirim"
+                      v-if="isBelumSelesai(servis.tanggalterkirim)"
                       class="btn-aksi btn-selesai"
                       title="Tandai Selesai"
                       @click="selesaiServis(servis.id_servis)"
@@ -221,7 +249,7 @@ return '-'
               </tr>
 
               <tr v-if="servisList.length === 0">
-                <td colspan="9" class="td-empty">
+                <td colspan="10" class="td-empty">
                   <span class="material-symbols-outlined empty-icon">inbox</span>
                   <p>Belum ada data servis.</p>
                 </td>
@@ -243,8 +271,8 @@ return '-'
             </button>
           </div>
 
-          <!-- PENTING: gunakan @submit.prevent, BUKAN <form action="..."> -->
           <form @submit.prevent="submitForm" class="modal-form">
+            <!-- Nama Barang (wajib) -->
             <div class="form-group">
               <label>Nama Barang</label>
               <input
@@ -255,6 +283,7 @@ return '-'
               />
             </div>
 
+            <!-- Bahan (wajib) + Jumlah (opsional) -->
             <div class="form-row">
               <div class="form-group">
                 <label>Bahan</label>
@@ -266,25 +295,47 @@ return '-'
                 />
               </div>
               <div class="form-group">
-                <label>Jumlah</label>
+                <label>
+                  Jumlah
+                  <span class="label-optional">(opsional)</span>
+                </label>
                 <input
                   v-model.number="form.jumlah"
                   type="number"
                   min="1"
-                  required
+                  placeholder="Default: 1"
                 />
               </div>
             </div>
 
+            <!-- Bentuk Barang (opsional) -->
             <div class="form-group">
-              <label>Bentuk Barang (kode)</label>
+              <label>
+                Bentuk Barang (kode)
+                <span class="label-optional">(opsional)</span>
+              </label>
               <input
                 v-model.number="form.bentuk_barang"
                 type="number"
                 min="1"
-                required
-                placeholder="Masukkan kode bentuk"
+                placeholder="Kosongkan jika tidak ada"
               />
+            </div>
+
+            <!-- Catatan (WAJIB) -->
+            <div class="form-group">
+              <label>
+                Catatan
+                <span class="label-required">*</span>
+              </label>
+              <textarea
+                v-model="form.catatan"
+                rows="4"
+                required
+                placeholder="Tambahkan catatan servis, kerusakan, atau permintaan khusus..."
+                maxlength="1000"
+              ></textarea>
+              <p class="char-counter">{{ form.catatan.length }} / 1000 karakter</p>
             </div>
 
             <div class="modal-actions">
@@ -466,6 +517,14 @@ td {
 .td-no     { font-weight: 700; color: #94a3b8; width: 50px; }
 .td-jumlah { font-weight: 700; color: #001e40; }
 
+.td-catatan {
+  max-width: 220px;
+  color: #64748b;
+  font-style: italic;
+  font-size: 13px;
+  cursor: help;
+}
+
 .nama-cell {
   display: flex;
   align-items: center;
@@ -600,7 +659,25 @@ td {
   text-transform: uppercase;
   letter-spacing: .06em;
 }
-.form-group input {
+
+.label-optional {
+  font-weight: 500;
+  color: #94a3b8;
+  text-transform: none;
+  letter-spacing: normal;
+  margin-left: 4px;
+  font-size: 11px;
+}
+
+.label-required {
+  color: #dc2626;
+  margin-left: 4px;
+  font-weight: 700;
+}
+
+.form-group input,
+.form-group textarea {
+  color: #000000;
   width: 100%;
   padding: 12px 14px;
   border: 1.5px solid #e2e8f0;
@@ -611,11 +688,27 @@ td {
   transition: border-color .2s, box-shadow .2s;
   box-sizing: border-box;
 }
-.form-group input:focus {
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.5;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
   outline: none;
   border-color: #006e25;
   box-shadow: 0 0 0 3px rgba(0,110,37,.12);
   background: #fff;
+}
+
+.char-counter {
+  margin: 6px 0 0;
+  font-size: 11px;
+  color: #94a3b8;
+  text-align: right;
+  font-weight: 500;
 }
 
 .form-row {
