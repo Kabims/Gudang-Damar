@@ -39,21 +39,24 @@ class BarangController extends Controller
     }
 
     public function update(Request $request, string $id)
-    {
-        $data = $this->validateData($request, false);
-        $barang = Barang::findOrFail($id);
+{
+    $barang = Barang::findOrFail($id);
 
-        $barang->update([
-            'nama'      => $data['nama'],
-            'harga'     => $data['harga']['harga'],
-            'total'     => $data['harga']['harga'] * $barang->jumlah,
-            'ukuran'    => $data['kategori']['ukuran'],
-            'ketebalan' => $data['kategori']['ketebalan'],
-            'bahan'     => $data['kategori']['bahan'],
-        ]);
+    $barang->update([
+        'nama'       => $request->nama,
+        'harga'      => $request->input('harga.harga'),
+        'jumlah'     => $request->input('harga.jumlah'),
+        'total'      => $request->input('harga.harga') * $request->input('harga.jumlah'),
+        'ukuran'     => $request->input('kategori.ukuran'),
+        'bentuk'     => $request->input('kategori.bentuk'),
+        'ketebalan'  => $request->input('kategori.ketebalan'),
+        'bahan'      => $request->input('kategori.bahan'),
+        'guna_merek' => $request->input('kategori.merek'),
+    ]);
 
-        return redirect()->route('barang.show', $id)->with('success', 'Barang berhasil diupdate!');
-    }
+    return redirect()->route('barang.index')
+                     ->with('success', 'Barang berhasil diupdate!');
+}
 
     public function destroy(string $id)
     {
