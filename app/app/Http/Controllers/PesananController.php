@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pesanan;
+use App\Models\Servis;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class PesananController extends Controller
 {
-    // LIST
     public function index()
     {
         return Inertia::render('pesanan/Index', [
@@ -16,7 +16,6 @@ class PesananController extends Controller
         ]);
     }
 
-    // TAMBAH — semua field wajib diisi dari form
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -24,29 +23,20 @@ class PesananController extends Controller
             'bahan'       => 'required|string|max:255',
             'jumlah'      => 'required|integer|min:1',
             'catatan'     => 'nullable|string|max:500',
+            'bentuk'      => 'nullable|string|max:255',   // ✨ varchar
+            'ukuran'      => 'nullable|numeric|min:0',    // ✨ float
+            'ketebalan'   => 'nullable|numeric|min:0',    // ✨ float
         ]);
 
         $data['tanggalpemesanan'] = now();
-        $data['tanggalterkirim'] = null;
-        $data['id_pesanan'] = (Pesanan::max('id_pesanan') ?? 0) + 1;
+        $data['tanggalterkirim']  = null;
+        $data['id_pesanan']       = (Pesanan::max('id_pesanan') ?? 0) + 1;
 
         Pesanan::create($data);
 
-        return redirect()->route('pesanan.index')
-            ->with('success', 'Pesanan berhasil ditambahkan!');
+        return redirect()->route('pesanan.index')->with('success', 'Pesanan berhasil ditambahkan!');
     }
 
-    // FORM EDIT (halaman terpisah)
-    public function edit($id)
-    {
-        $pesanan = Pesanan::findOrFail($id);
-
-        return Inertia::render('pesanan/Edit', [
-            'pesanan' => $pesanan,
-        ]);
-    }
-
-    // UPDATE
     public function update(Request $request, $id)
     {
         $pesanan = Pesanan::findOrFail($id);
@@ -56,6 +46,9 @@ class PesananController extends Controller
             'bahan'       => 'required|string|max:255',
             'jumlah'      => 'required|integer|min:1',
             'catatan'     => 'nullable|string|max:500',
+            'bentuk'      => 'nullable|string|max:255',   // ✨ varchar
+            'ukuran'      => 'nullable|numeric|min:0',    // ✨ float
+            'ketebalan'   => 'nullable|numeric|min:0',    // ✨ float
         ]);
 
         if ($request->is_terkirim && !$pesanan->tanggalterkirim) {
@@ -63,31 +56,45 @@ class PesananController extends Controller
         }
 
         $pesanan->update($data);
-
-        return redirect()->route('pesanan.index')
-            ->with('success', 'Pesanan berhasil diperbarui!');
+        return redirect()->route('pesanan.index')->with('success', 'Pesanan berhasil diperbarui!');
     }
 
-    // HAPUS
     public function destroy($id)
     {
         $pesanan = Pesanan::findOrFail($id);
-        $pesanan->delete();
 
-        return redirect()->route('pesanan.index')
-            ->with('success', 'Pesanan berhasil dihapus!');
+        // CEK RELASI: Jangan hapus jika ada data di tabel servis
+        $adaServis = Servis::where('id_pesanan', $pesanan->id_pesanan)->exists();
+
+        if ($adaServis) {
+            return redirect()->route('pesanan.index')
+                ->with('error', 'Gagal hapus! Masih ada data servis yang terhubung ke pesanan ini.');
+        }
+
+        $pesanan->delete();
+        return redirect()->route('pesanan.index')->with('success', 'Pesanan berhasil dihapus!');
     }
 
-    // TANDAI TERKIRIM
     public function selesai($id)
     {
         $pesanan = Pesanan::findOrFail($id);
 
-        if (! $pesanan->tanggalterkirim) {
-            $pesanan->update(['tanggalterkirim' => now()]);
+        if (!$pesanan->tanggalterkirim) {
+            $pesanan->update([
+                'tanggalterkirim' => now()
+            ]);
         }
 
-        return redirect()->route('pesanan.index')
-            ->with('success', 'Pesanan ditandai terkirim!');
+        return redirect()->route('pesanan.index')->with('success', 'Pesanan berhasil diselesaikan!');
+    }
+
+    public function edit($id)
+    {
+        $pesanan = Pesanan::findOrFail($id);
+
+        // Kirim data ke halaman Edit di Vue
+        return Inertia::render('pesanan/Edit', [
+            'pesanan' => $pesanan
+        ]);
     }
 }

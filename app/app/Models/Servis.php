@@ -1,5 +1,4 @@
 <?php
-// app/Models/Servis.php
 
 namespace App\Models;
 
@@ -11,15 +10,14 @@ class Servis extends Model
     use HasFactory;
 
     protected $table = 'servis';
+
     protected $primaryKey = 'id_pesanan';
     public $timestamps = false;
-
-    // ✨ Penting: beritahu Laravel bahwa PK BUKAN auto-increment
-    public $incrementing = false;
+    public $incrementing = false; 
     protected $keyType = 'int';
 
     protected $fillable = [
-        'id_pesanan',       // ← tambahkan agar bisa di-fill manual
+        'id_pesanan',
         'nama_barang',
         'bahan',
         'jumlah',
@@ -44,10 +42,6 @@ class Servis extends Model
         return $this->id_pesanan;
     }
 
-    /**
-     * ✨ Auto-generate id_pesanan saat create
-     * Ambil ID terbesar yang ada, lalu +1
-     */
     protected static function booted()
     {
         static::creating(function ($servis) {

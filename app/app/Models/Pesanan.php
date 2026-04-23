@@ -24,6 +24,9 @@ class Pesanan extends Model
         'jumlah',
         'tanggalpemesanan',
         'tanggalterkirim',
+        'bentuk',      
+        'ukuran',    
+        'ketebalan',  
     ];
 
     protected $casts = [
@@ -33,12 +36,11 @@ class Pesanan extends Model
         'jumlah'           => 'integer',
         'tanggalpemesanan' => 'datetime',
         'tanggalterkirim'  => 'datetime',
+        'ukuran'           => 'float',   
+        'ketebalan'        => 'float',   
     ];
 
-    /**
-     * ✨ Auto-generate id_pesanan saat create
-     * Ambil ID terbesar yang ada, lalu +1
-     */
+
     protected static function booted()
     {
         static::creating(function ($pesanan) {
@@ -49,7 +51,7 @@ class Pesanan extends Model
         });
     }
 
-    // ── Relasi ──────────────────────────────────────────────
+
 
     public function barang()
     {

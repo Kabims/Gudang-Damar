@@ -12,12 +12,18 @@ const props = defineProps({
 
 // ── State modal ──────────────────────────────────────────────
 const showModal = ref(false)
+const isSubmitting = ref(false)          // ⏳ loading spinner
+const showSuccessModal = ref(false)      // 🎉 popup sukses
+const successData = ref(null)            // data yang baru disimpan
 
 const form = reactive({
   nama_barang: '',
   bahan:       '',
   jumlah:      1,
   catatan:     '',
+  bentuk:      '',   // ✨ baru
+  ukuran:      '',   // ✨ baru (float)
+  ketebalan:   '',   // ✨ baru (float)
 })
 
 // ── Helpers ──────────────────────────────────────────────────
@@ -26,6 +32,9 @@ const resetForm = () => {
   form.bahan       = ''
   form.jumlah      = 1
   form.catatan     = ''
+  form.bentuk      = ''
+  form.ukuran      = ''
+  form.ketebalan   = ''
 }
 
 const formatDate = (dateString) => {
@@ -46,14 +55,37 @@ const openTambah = () => {
 }
 
 const closeModal = () => {
+  if (isSubmitting.value) return   // cegah close saat loading
   showModal.value = false
   resetForm()
 }
 
+const closeSuccessModal = () => {
+  showSuccessModal.value = false
+  successData.value = null
+}
+
 // ── Submit ───────────────────────────────────────────────────
 const submitForm = () => {
+  isSubmitting.value = true
+
+  // simpan snapshot data untuk popup sukses
+  const snapshot = { ...form }
+
   router.post('/pesanan', { ...form }, {
-    onSuccess: () => closeModal()
+    preserveScroll: true,
+    onSuccess: () => {
+      showModal.value = false
+      successData.value = snapshot           // tampilkan di popup
+      showSuccessModal.value = true
+      resetForm()
+    },
+    onError: () => {
+      // biarkan modal terbuka supaya user bisa perbaiki
+    },
+    onFinish: () => {
+      isSubmitting.value = false
+    }
   })
 }
 
@@ -179,6 +211,18 @@ const hapusPesanan = (id) => {
                 <span class="info-label">Jumlah</span>
                 <span class="info-value">{{ p.jumlah }}</span>
               </div>
+              <div v-if="p.bentuk" class="info-item">
+                <span class="info-label">Bentuk</span>
+                <span class="info-value">{{ p.bentuk }}</span>
+              </div>
+              <div v-if="p.ukuran" class="info-item">
+                <span class="info-label">Ukuran</span>
+                <span class="info-value">{{ p.ukuran }}</span>
+              </div>
+              <div v-if="p.ketebalan" class="info-item">
+                <span class="info-label">Ketebalan</span>
+                <span class="info-value">{{ p.ketebalan }}</span>
+              </div>
             </div>
 
             <div class="catatan-section">
@@ -231,9 +275,15 @@ const hapusPesanan = (id) => {
       <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
         <div class="modal-card" @click.stop>
 
+          <!-- Loading Overlay (di dalam modal) -->
+          <div v-if="isSubmitting" class="loading-overlay">
+            <div class="spinner"></div>
+            <p class="loading-text">Menyimpan pesanan...</p>
+          </div>
+
           <div class="modal-header">
             <h2>Tambah Pesanan Baru</h2>
-            <button class="modal-close" @click="closeModal">
+            <button class="modal-close" @click="closeModal" :disabled="isSubmitting">
               <span class="material-symbols-outlined">close</span>
             </button>
           </div>
@@ -245,6 +295,7 @@ const hapusPesanan = (id) => {
                 v-model="form.nama_barang"
                 type="text"
                 required
+                :disabled="isSubmitting"
                 placeholder="Contoh: Piring"
               />
             </div>
@@ -256,6 +307,7 @@ const hapusPesanan = (id) => {
                   v-model="form.bahan"
                   type="text"
                   required
+                  :disabled="isSubmitting"
                   placeholder="Contoh: Besi, Kayu, PVC"
                 />
               </div>
@@ -266,6 +318,44 @@ const hapusPesanan = (id) => {
                   type="number"
                   min="1"
                   required
+                  :disabled="isSubmitting"
+                />
+              </div>
+            </div>
+
+            <!-- ✨ Field baru: Bentuk -->
+            <div class="form-group">
+              <label>Bentuk <span class="label-opt">(opsional)</span></label>
+              <input
+                v-model="form.bentuk"
+                type="text"
+                :disabled="isSubmitting"
+                placeholder="Contoh: Persegi, Bulat, Persegi Panjang"
+              />
+            </div>
+
+            <!-- ✨ Field baru: Ukuran & Ketebalan -->
+            <div class="form-row">
+              <div class="form-group">
+                <label>Ukuran <span class="label-opt">(opsional)</span></label>
+                <input
+                  v-model.number="form.ukuran"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  :disabled="isSubmitting"
+                  placeholder="Contoh: 10.5"
+                />
+              </div>
+              <div class="form-group">
+                <label>Ketebalan <span class="label-opt">(opsional)</span></label>
+                <input
+                  v-model.number="form.ketebalan"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  :disabled="isSubmitting"
+                  placeholder="Contoh: 2.5"
                 />
               </div>
             </div>
@@ -275,18 +365,98 @@ const hapusPesanan = (id) => {
               <textarea
                 v-model="form.catatan"
                 rows="3"
+                :disabled="isSubmitting"
                 placeholder="Tambahkan catatan khusus untuk pesanan ini…"
               ></textarea>
             </div>
 
             <div class="modal-actions">
-              <button type="button" class="btn-batal" @click="closeModal">Batal</button>
-              <button type="submit" class="btn-simpan">
-                <span class="material-symbols-outlined">add</span>
-                Tambah Pesanan
+              <button
+                type="button"
+                class="btn-batal"
+                @click="closeModal"
+                :disabled="isSubmitting"
+              >
+                Batal
+              </button>
+              <button
+                type="submit"
+                class="btn-simpan"
+                :disabled="isSubmitting"
+              >
+                <span v-if="!isSubmitting" class="material-symbols-outlined">add</span>
+                <span v-else class="btn-spinner"></span>
+                {{ isSubmitting ? 'Menyimpan...' : 'Tambah Pesanan' }}
               </button>
             </div>
           </form>
+        </div>
+      </div>
+    </Teleport>
+
+    <!-- ── 🎉 Modal Sukses ─────────────────────────────────── -->
+    <Teleport to="body">
+      <div v-if="showSuccessModal" class="modal-overlay" @click.self="closeSuccessModal">
+        <div class="success-card" @click.stop>
+
+          <!-- Success Icon with animation -->
+          <div class="success-icon-wrapper">
+            <div class="success-icon">
+              <svg viewBox="0 0 52 52" class="checkmark-svg">
+                <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+              </svg>
+            </div>
+          </div>
+
+          <h2 class="success-title">Berhasil Tersimpan! 🎉</h2>
+          <p class="success-subtitle">
+            Pesanan barang telah berhasil ditambahkan ke dalam sistem.
+          </p>
+
+          <!-- Detail Pesanan -->
+          <div v-if="successData" class="success-detail">
+            <div class="detail-header">
+              <span class="material-symbols-outlined">inventory_2</span>
+              <span>Detail Pesanan</span>
+            </div>
+
+            <div class="detail-grid">
+              <div class="detail-row">
+                <span class="detail-label">Nama Barang</span>
+                <span class="detail-value highlight">{{ successData.nama_barang }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Bahan</span>
+                <span class="detail-value">{{ successData.bahan }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Jumlah</span>
+                <span class="detail-value">{{ successData.jumlah }}</span>
+              </div>
+              <div v-if="successData.bentuk" class="detail-row">
+                <span class="detail-label">Bentuk</span>
+                <span class="detail-value">{{ successData.bentuk }}</span>
+              </div>
+              <div v-if="successData.ukuran" class="detail-row">
+                <span class="detail-label">Ukuran</span>
+                <span class="detail-value">{{ successData.ukuran }}</span>
+              </div>
+              <div v-if="successData.ketebalan" class="detail-row">
+                <span class="detail-label">Ketebalan</span>
+                <span class="detail-value">{{ successData.ketebalan }}</span>
+              </div>
+              <div v-if="successData.catatan" class="detail-row detail-row-full">
+                <span class="detail-label">Catatan</span>
+                <span class="detail-value detail-catatan">{{ successData.catatan }}</span>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn-success-ok" @click="closeSuccessModal">
+            <span class="material-symbols-outlined">done</span>
+            Mengerti
+          </button>
         </div>
       </div>
     </Teleport>
@@ -696,6 +866,7 @@ const hapusPesanan = (id) => {
 }
 
 .modal-card {
+  position: relative;
   background: #fff;
   border-radius: 20px;
   width: 540px;
@@ -709,6 +880,54 @@ const hapusPesanan = (id) => {
 
 @keyframes fadeIn  { from { opacity: 0 } to { opacity: 1 } }
 @keyframes slideUp { from { opacity: 0; transform: translateY(24px) } to { opacity: 1; transform: translateY(0) } }
+
+/* ── Loading Overlay (di dalam modal) ─────────────────────── */
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,.92);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  border-radius: 20px;
+  backdrop-filter: blur(3px);
+  animation: fadeIn .2s ease;
+}
+
+.spinner {
+  width: 56px;
+  height: 56px;
+  border: 5px solid #e2e8f0;
+  border-top-color: #006e25;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: #006e25;
+  margin: 0;
+  letter-spacing: .02em;
+}
+
+/* Spinner mini untuk tombol */
+.btn-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
 
 .modal-header {
   display: flex;
@@ -736,6 +955,7 @@ const hapusPesanan = (id) => {
   transition: background .15s;
 }
 .modal-close:hover { background: #e2e8f0; }
+.modal-close:disabled { opacity: .5; cursor: not-allowed; }
 
 .modal-form { padding: 24px 28px 28px; }
 
@@ -777,6 +997,11 @@ const hapusPesanan = (id) => {
   box-shadow: 0 0 0 3px rgba(0,110,37,.12);
   background: #fff;
 }
+.form-group input:disabled,
+.form-group textarea:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
 
 .form-row {
   display: grid;
@@ -802,7 +1027,8 @@ const hapusPesanan = (id) => {
   cursor: pointer;
   transition: background .15s;
 }
-.btn-batal:hover { background: #f1f5f9; }
+.btn-batal:hover:not(:disabled) { background: #f1f5f9; }
+.btn-batal:disabled { opacity: .5; cursor: not-allowed; }
 
 .btn-simpan {
   display: flex;
@@ -819,11 +1045,197 @@ const hapusPesanan = (id) => {
   box-shadow: 0 6px 16px rgba(0,110,37,.2);
   transition: transform .15s, box-shadow .15s;
 }
-.btn-simpan:hover {
+.btn-simpan:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow: 0 8px 24px rgba(0,110,37,.3);
 }
+.btn-simpan:disabled {
+  opacity: .75;
+  cursor: not-allowed;
+}
 .btn-simpan .material-symbols-outlined { font-size: 18px; }
+
+/* ── 🎉 Success Modal ─────────────────────────────────────── */
+.success-card {
+  background: #fff;
+  border-radius: 24px;
+  width: 480px;
+  max-width: 92vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 32px 28px 28px;
+  box-shadow: 0 24px 64px rgba(0,0,0,.18);
+  animation: slideUp .3s ease;
+  text-align: center;
+  color: #000;
+}
+
+.success-icon-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.success-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: popIn .5s cubic-bezier(.175,.885,.32,1.275);
+}
+
+@keyframes popIn {
+  0%   { transform: scale(0); opacity: 0; }
+  60%  { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.checkmark-svg {
+  width: 52px;
+  height: 52px;
+  stroke-width: 4;
+  stroke: #16a34a;
+  stroke-miterlimit: 10;
+}
+
+.checkmark-circle {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke-width: 3;
+  stroke: #16a34a;
+  fill: none;
+  animation: strokeCircle .6s cubic-bezier(.65,0,.45,1) forwards;
+}
+
+.checkmark-check {
+  transform-origin: 50% 50%;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: strokeCheck .4s .5s cubic-bezier(.65,0,.45,1) forwards;
+}
+
+@keyframes strokeCircle { to { stroke-dashoffset: 0; } }
+@keyframes strokeCheck  { to { stroke-dashoffset: 0; } }
+
+.success-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #000;
+  margin: 0 0 8px;
+  letter-spacing: -0.01em;
+}
+
+.success-subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0 0 24px;
+  line-height: 1.5;
+}
+
+.success-detail {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #006e25;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed #cbd5e1;
+}
+.detail-header .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.detail-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.detail-row-full {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.detail-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  flex-shrink: 0;
+}
+
+.detail-value {
+  font-weight: 600;
+  color: #000;
+  text-align: right;
+}
+
+.detail-value.highlight {
+  color: #006e25;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.detail-catatan {
+  text-align: left;
+  font-weight: 500;
+  line-height: 1.5;
+  background: #fff;
+  padding: 8px 10px;
+  border-radius: 6px;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #e2e8f0;
+}
+
+.btn-success-ok {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 24px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #006e25, #00a63e);
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0,110,37,.25);
+  transition: transform .15s, box-shadow .15s;
+}
+.btn-success-ok:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(0,110,37,.35);
+}
+.btn-success-ok .material-symbols-outlined { font-size: 18px; }
 
 /* ── Footer ───────────────────────────────────────────────── */
 footer {
