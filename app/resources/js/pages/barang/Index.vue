@@ -85,6 +85,7 @@ const activeLabel = computed(
 );
 
 const rupiah = (n: number) => 'Rp ' + n.toLocaleString('id-ID');
+const isLoading = ref(false);
 
 function openDetail(barang: Barang) {
     selectedBarang.value = barang;
@@ -101,6 +102,7 @@ function closeEdit() { showEdit.value = false; }
 
 
 function submitEdit() {
+    isLoading.value = true;
     router.put(`/barang/${editForm.value.id_barang}`, {
         nama: editForm.value.nama,
         harga: {
@@ -116,13 +118,11 @@ function submitEdit() {
         },
     }, {
         onSuccess: () => {
+            isLoading.value = false;
             closeEdit();
-            Swal.fire({
-                title: 'Berhasil!',
-                text: 'Barang berhasil diupdate!',
-                icon: 'success',
-            });
+            Swal.fire({ title: 'Berhasil!', text: 'Barang berhasil diupdate!', icon: 'success' });
         },
+        onError: () => { isLoading.value = false; },
     });
 }
 
@@ -137,14 +137,13 @@ function hapus(id: number) {
         confirmButtonText: 'Yes, delete it!',
     }).then((result) => {
         if (result.isConfirmed) {
+            isLoading.value = true;
             router.delete(`/barang/${id}`, {
                 onSuccess: () => {
-                    Swal.fire({
-                        title: 'Deleted!',
-                        text: 'Barang berhasil dihapus.',
-                        icon: 'success',
-                    });
+                    isLoading.value = false;
+                    Swal.fire({ title: 'Deleted!', text: 'Barang berhasil dihapus.', icon: 'success' });
                 },
+                onError: () => { isLoading.value = false; },
             });
         }
     });
@@ -184,6 +183,7 @@ function submitSet() {
     }
 
     const stokBaru = selectedBarang.value.jumlah + setJumlah.value;
+    isLoading.value = true;
 
     router.put(`/barang/${selectedBarang.value.id_barang}`, {
         nama: selectedBarang.value.nama,
@@ -197,13 +197,11 @@ function submitSet() {
         },
     }, {
         onSuccess: () => {
+            isLoading.value = false;
             closeDetail();
-            Swal.fire({
-                title: 'Berhasil!',
-                text: `Stok berhasil diupdate menjadi ${stokBaru}`,
-                icon: 'success',
-            });
+            Swal.fire({ title: 'Berhasil!', text: `Stok berhasil diupdate menjadi ${stokBaru}`, icon: 'success' });
         },
+        onError: () => { isLoading.value = false; },
     });
 }
 
@@ -219,7 +217,8 @@ function submitJual() {
     }
 
     const stokBaru = selectedBarang.value.jumlah - jualJumlah.value;
-    const terjual = jualJumlah.value; // simpan dulu sebelum closeDetail reset ke 0
+    const terjual = jualJumlah.value;
+    isLoading.value = true;
 
     router.put(`/barang/${selectedBarang.value.id_barang}`, {
         nama: selectedBarang.value.nama,
@@ -233,15 +232,14 @@ function submitJual() {
         },
     }, {
         onSuccess: () => {
+            isLoading.value = false;
             closeDetail();
-            Swal.fire({
-                title: 'Terjual!',
-                text: `Penjualan ${terjual} unit tercatat. Sisa stok: ${stokBaru}`,
-                icon: 'success',
-            });
+            Swal.fire({ title: 'Terjual!', text: `Penjualan ${terjual} unit tercatat. Sisa stok: ${stokBaru}`, icon: 'success' });
         },
+        onError: () => { isLoading.value = false; },
     });
 }
+
 </script>
 
 <template>
@@ -529,6 +527,13 @@ function submitJual() {
         </div>
     </div>
 </Transition>
+    <!-- Loading Overlay -->
+    <Transition name="fade">
+        <div v-if="isLoading"
+            class="fixed inset-0 bg-black/40 z-[9999] flex items-center justify-center">
+            <div class="loader"></div>
+        </div>
+    </Transition>
     </div>
 </template>
 
@@ -573,5 +578,24 @@ function submitJual() {
 .slide-leave-to {
     opacity: 0;
     transform: translateY(-8px);
+}
+.loader {
+    width: 50px;
+    padding: 8px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #25b09b;
+    --_m:
+        conic-gradient(#0000 10%, #000),
+        linear-gradient(#000 0 0) content-box;
+    -webkit-mask: var(--_m);
+    mask: var(--_m);
+    -webkit-mask-composite: source-out;
+    mask-composite: subtract;
+    animation: l3 1s infinite linear;
+}
+
+@keyframes l3 {
+    to { transform: rotate(1turn); }
 }
 </style>
