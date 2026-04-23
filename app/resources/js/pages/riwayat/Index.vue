@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, router } from '@inertiajs/vue3';
+import { Head, router, Link } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import Navbar from '@/components/Navbar.vue';
 
@@ -180,13 +180,24 @@ const exportData = () => {
                             Gabungan riwayat Pesanan, Barang, dan Servis.
                         </p>
                     </div>
-                    <button
-                        @click="exportData"
-                        class="flex items-center gap-2 rounded-lg bg-[#006e25] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-[#006e25]/20 transition-all hover:opacity-90"
-                    >
-                        <span class="material-symbols-outlined text-sm">file_download</span>
-                        Export Data
-                    </button>
+                    <div class="flex items-center gap-3">
+                        <!-- BUTTON GRAFIK -->
+                        <Link 
+                            href="/grapik"
+                            class="flex items-center gap-2 bg-surface-container-lowest border border-slate-200 text-primary px-4 py-2.5 rounded-lg font-bold text-sm hover:bg-slate-50 transition-all"
+                        >
+                            <span class="material-symbols-outlined text-lg">leaderboard</span>
+                            Grafik
+                        </Link>
+
+                        <button
+                            @click="exportData"
+                            class="flex items-center gap-2 rounded-lg bg-[#006e25] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-[#006e25]/20 transition-all hover:opacity-90"
+                        >
+                            <span class="material-symbols-outlined text-sm">file_download</span>
+                            Export Data
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -273,23 +284,22 @@ const exportData = () => {
                         <option value="Selesai">Selesai</option>
                     </select>
 
-                    <select
-                        v-model="kategori"
-                        @change="applyFilters"
-                        class="cursor-pointer rounded-lg border-none bg-white px-4 py-2.5 text-sm font-medium focus:ring-2 focus:ring-[#006e25]/50"
-                    >
-                        <option value="all">Semua Kategori</option>
-                        <option value="Material">Material</option>
-                        <option value="Alat Berat">Alat Berat</option>
-                        <option value="Komponen">Komponen</option>
-                    </select>
+                    <div class="flex items-center gap-3">
 
-                    <button
-                        @click="applyFilters"
-                        class="rounded-lg bg-[#001e40] p-2.5 text-white transition-all hover:opacity-90"
+                    <!-- BUTTON GRAFIK -->
+                    <Link 
+                        href="/grapik"
+                        class="flex items-center gap-2 bg-surface-container-lowest border border-slate-200 text-primary px-4 py-2.5 rounded-lg font-bold text-sm hover:bg-slate-50 transition-all"
                     >
-                        <span class="material-symbols-outlined">tune</span>
-                    </button>
+                        <span class="material-symbols-outlined text-lg">leaderboard</span>
+                        Grafik
+                    </Link>
+
+                    </div>
+
+
+
+                    
                 </div>
             </div>
 

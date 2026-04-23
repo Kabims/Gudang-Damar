@@ -46,6 +46,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/test-image', function () {
         return view('test-image');
     });
+
+    Route::get('/grapik', function () {
+        return Inertia\Inertia::render('grapik/index');
+    })->name('grapik.index');
 });
 
 Route::prefix('riwayat')->name('riwayat.')->group(function () {
