@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { Head } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { Head, router } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
 import Navbar from '@/components/Navbar.vue';
 
-// Define expected properties from the Inertia page
+// Props dari AktivitasController@index
 const props = defineProps({
     transactions: {
         type: Object,
@@ -12,25 +12,42 @@ const props = defineProps({
             current_page: 1,
             last_page: 1,
             total: 0,
+            per_page: 10,
         }),
     },
     stats: {
         type: Object,
         default: () => ({
-            total_transaksi: 1284,
-            total_barang_terjual: 4592,
-            total_pendapatan: 2400000000,
+            total_transaksi: 0,
+            total_barang_terjual: 0,
+            total_pendapatan: 0,
+            total_pesanan: 0,
+            total_servis: 0,
+        }),
+    },
+    filters: {
+        type: Object,
+        default: () => ({
+            search: '',
+            jenis: 'all',
+            status: 'all',
+            kategori: 'all',
         }),
     },
 });
 
-// Format date to locale string
-const formatDate = (dateString: string) => {
-    if (!dateString) {
-return '-';
-}
+// Reactive filter state
+const search = ref(props.filters.search || '');
+const jenis = ref(props.filters.jenis || 'all');
+const status = ref(props.filters.status || 'all');
+const kategori = ref(props.filters.kategori || 'all');
 
-    // Example format: 24 Jan 2024
+// Format tanggal
+const formatDate = (dateString: string | null) => {
+    if (!dateString) {
+        return '-';
+    }
+
     return new Date(dateString).toLocaleDateString('id-ID', {
         day: '2-digit',
         month: 'short',
@@ -38,8 +55,12 @@ return '-';
     });
 };
 
-// Format currency IDR
+// Format mata uang IDR
 const formatCurrency = (amount: number) => {
+    if (!amount || amount === 0) {
+        return '-';
+    }
+
     return new Intl.NumberFormat('id-ID', {
         style: 'currency',
         currency: 'IDR',
@@ -48,169 +69,122 @@ const formatCurrency = (amount: number) => {
     }).format(amount);
 };
 
-// Determine status based on dates or passed status field
-const getStatus = (item: any) => {
-    return item.tanggalterkirim ? 'Selesai' : 'Dipesan';
-};
+// Ikon berdasarkan jenis aktivitas
+const getIconByJenis = (jenis: string) => {
+    const j = (jenis || '').toLowerCase();
 
-// Determine proper icon based on category/bahan
-const getIcon = (kategori: string) => {
-    const k = kategori ? kategori.toLowerCase() : '';
+    if (j === 'pesanan') {
+        return 'shopping_cart';
+    }
 
-    if (k.includes('alat')) {
-return 'construction';
-}
+    if (j === 'servis') {
+        return 'build';
+    }
 
-    if (k.includes('material') || k.includes('baja')) {
-return 'square_foot';
-}
-
-    if (
-        k.includes('komponen') ||
-        k.includes('electric') ||
-        k.includes('galvanis')
-    ) {
-return 'settings_input_component';
-}
-
-    if (k.includes('pipa')) {
-return 'plumbing';
-}
+    if (j === 'barang') {
+        return 'inventory_2';
+    }
 
     return 'inventory';
 };
 
-// Default fake items if database data is empty to showcase the design
-const displayTransactions = computed(() => {
-    if (
-        props.transactions &&
-        props.transactions.data &&
-        props.transactions.data.length > 0
-    ) {
-        return props.transactions.data;
+// Warna badge berdasarkan jenis
+const getJenisBadgeClass = (jenis: string) => {
+    const j = (jenis || '').toLowerCase();
+
+    if (j === 'pesanan') {
+        return 'bg-blue-100 text-blue-800';
     }
 
-    // Fallback UI matching the HTML design perfectly
-    return [
+    if (j === 'servis') {
+        return 'bg-purple-100 text-purple-800';
+    }
+
+    if (j === 'barang') {
+        return 'bg-amber-100 text-amber-800';
+    }
+
+    return 'bg-slate-100 text-slate-800';
+};
+
+// Data yang ditampilkan
+const displayTransactions = computed(() => props.transactions?.data ?? []);
+
+// Apply filter -> reload halaman
+const applyFilters = () => {
+    router.get(
+        '/riwayat',
         {
-            id_pesanan: 1,
-            nama_barang: 'Excavator Hydraulic Pump',
-            bahan: 'Alat Berat',
-            jumlah: 2,
-            harga_satuan: 45000000,
-            tanggalterkirim: '2024-01-24',
-            tanggalpemesanan: '2024-01-24',
+            search: search.value,
+            jenis: jenis.value,
+            status: status.value,
+            kategori: kategori.value,
         },
+        { preserveState: true, preserveScroll: true },
+    );
+};
+
+// Ganti halaman
+const goToPage = (page: number) => {
+    router.get(
+        '/riwayat',
         {
-            id_pesanan: 2,
-            nama_barang: 'Baja Profil H-Beam 200',
-            bahan: 'Material',
-            jumlah: 50,
-            harga_satuan: 2150000,
-            tanggalterkirim: null, // Still ordered
-            tanggalpemesanan: '2024-01-23',
+            page,
+            search: search.value,
+            jenis: jenis.value,
+            status: status.value,
+            kategori: kategori.value,
         },
-        {
-            id_pesanan: 3,
-            nama_barang: 'Cable Tray Galvanis 300mm',
-            bahan: 'Komponen',
-            jumlah: 120,
-            harga_satuan: 450000,
-            tanggalterkirim: null,
-            tanggalpemesanan: '2024-01-22',
-        },
-        {
-            id_pesanan: 4,
-            nama_barang: 'Electrical Switchboard G-12',
-            bahan: 'Alat Berat',
-            jumlah: 5,
-            harga_satuan: 12800000,
-            tanggalterkirim: '2024-01-21',
-            tanggalpemesanan: '2024-01-21',
-        },
-        {
-            id_pesanan: 5,
-            nama_barang: 'Pipa Galvanis 4 Inch',
-            bahan: 'Material',
-            jumlah: 300,
-            harga_satuan: 185000,
-            tanggalterkirim: '2024-01-20',
-            tanggalpemesanan: '2024-01-20',
-        },
-    ];
-});
+        { preserveState: true, preserveScroll: true },
+    );
+};
+
+// Lihat detail
+const viewDetail = (item: any) => {
+    router.visit(`/riwayat/${item.jenis.toLowerCase()}/${item.id}`);
+};
+
+// Export
+const exportData = () => {
+    window.location.href = `/riwayat/export?search=${search.value}&jenis=${jenis.value}&status=${status.value}`;
+};
 </script>
 
 <template>
-    <div
-        style="
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            background-color: #f8f9fa;
-        "
-    >
+    <div style="display: flex; flex-direction: column; min-height: 100vh; background-color: #f8f9fa;">
         <Head>
-            <title>Riwayat Barang - Gudang Damar</title>
-            <link
-                href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
-                rel="stylesheet"
-            />
-            <link
-                href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-                rel="stylesheet"
-            />
+            <title>Riwayat Aktivitas - Gudang Damar</title>
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet" />
+            <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
         </Head>
 
-        <!-- Use Existing Navbar like in Dashboard -->
         <Navbar />
 
-        <!-- Main Content Area -->
         <main
-            style="
-                flex: 1;
-                padding: 40px 20px;
-                max-width: 1600px;
-                margin: 0 auto;
-                width: 100%;
-                box-sizing: border-box;
-            "
+            style="flex: 1; padding: 40px 20px; max-width: 1600px; margin: 0 auto; width: 100%; box-sizing: border-box;"
             class="font-body text-[#191c1d]"
         >
-            <!-- Header Section -->
+            <!-- Header -->
             <div class="mb-10">
-                <nav
-                    class="mb-4 flex items-center gap-2 text-xs font-bold tracking-widest text-slate-400 uppercase"
-                >
+                <nav class="mb-4 flex items-center gap-2 text-xs font-bold tracking-widest text-slate-400 uppercase">
                     <a href="/barang">Penyimpanan</a>
-                    <span
-                        class="material-symbols-outlined text-[14px]"
-                        data-icon="chevron_right"
-                        >chevron_right</span
-                    >
-                    <span class="text-[#001e40]">Riwayat Barang</span>
+                    <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+                    <span class="text-[#001e40]">Riwayat Aktivitas</span>
                 </nav>
-                <div
-                    class="flex flex-col items-start justify-between gap-4 md:flex-row md:items-end"
-                >
+                <div class="flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
                     <div>
-                        <h2
-                            class="mb-2 text-4xl font-extrabold tracking-tight text-[#001e40]"
-                        >
-                            Riwayat Barang
+                        <h2 class="mb-2 text-4xl font-extrabold tracking-tight text-[#001e40]">
+                            Riwayat Aktivitas
                         </h2>
                         <p class="text-lg text-[#43474f]">
-                            Daftar barang yang telah dipesan atau dibeli.
+                            Gabungan riwayat Pesanan, Barang, dan Servis.
                         </p>
                     </div>
                     <button
+                        @click="exportData"
                         class="flex items-center gap-2 rounded-lg bg-[#006e25] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-[#006e25]/20 transition-all hover:opacity-90"
                     >
-                        <span
-                            class="material-symbols-outlined text-sm"
-                            data-icon="file_download"
-                            >file_download</span
-                        >
+                        <span class="material-symbols-outlined text-sm">file_download</span>
                         Export Data
                     </button>
                 </div>
@@ -218,118 +192,44 @@ const displayTransactions = computed(() => {
 
             <!-- Summary Cards -->
             <div class="mb-10 grid grid-cols-1 gap-6 md:grid-cols-3">
-                <div
-                    class="group rounded-xl bg-white p-6 shadow-[0_12px_40px_rgba(0,30,64,0.04)] transition-all duration-300 hover:shadow-lg"
-                >
+                <div class="group rounded-xl bg-white p-6 shadow-[0_12px_40px_rgba(0,30,64,0.04)] transition-all duration-300 hover:shadow-lg">
                     <div class="mb-4 flex items-start justify-between">
-                        <div
-                            class="rounded-lg bg-[#f3f4f5] p-3 transition-colors group-hover:bg-[#003366] group-hover:text-white"
-                        >
-                            <span
-                                class="material-symbols-outlined"
-                                data-icon="receipt_long"
-                                >receipt_long</span
-                            >
+                        <div class="rounded-lg bg-[#f3f4f5] p-3 transition-colors group-hover:bg-[#003366] group-hover:text-white">
+                            <span class="material-symbols-outlined">receipt_long</span>
                         </div>
-                        <span
-                            class="flex items-center gap-1 rounded-full bg-[#80f98b] px-2 py-1 text-xs font-bold text-[#006e25]"
-                        >
-                            <span
-                                class="material-symbols-outlined text-[14px]"
-                                data-icon="trending_up"
-                                >trending_up</span
-                            >
-                            +12.5%
-                        </span>
                     </div>
-                    <p
-                        class="mb-1 text-[11px] font-bold tracking-widest text-slate-400 uppercase"
-                    >
-                        Total Transaksi
-                    </p>
-                    <h3
-                        class="text-3xl font-extrabold tracking-tight text-[#001e40]"
-                    >
+                    <p class="mb-1 text-[11px] font-bold tracking-widest text-slate-400 uppercase">Total Transaksi</p>
+                    <h3 class="text-3xl font-extrabold tracking-tight text-[#001e40]">
                         {{ stats.total_transaksi.toLocaleString('id-ID') }}
                     </h3>
+                    <p class="mt-2 text-xs text-slate-500">
+                        Pesanan: {{ stats.total_pesanan }} | Servis: {{ stats.total_servis }}
+                    </p>
                 </div>
 
-                <div
-                    class="group rounded-xl bg-white p-6 shadow-[0_12px_40px_rgba(0,30,64,0.04)] transition-all duration-300 hover:shadow-lg"
-                >
+                <div class="group rounded-xl bg-white p-6 shadow-[0_12px_40px_rgba(0,30,64,0.04)] transition-all duration-300 hover:shadow-lg">
                     <div class="mb-4 flex items-start justify-between">
-                        <div
-                            class="rounded-lg bg-[#f3f4f5] p-3 transition-colors group-hover:bg-[#003366] group-hover:text-white"
-                        >
-                            <span
-                                class="material-symbols-outlined"
-                                data-icon="inventory"
-                                >inventory</span
-                            >
+                        <div class="rounded-lg bg-[#f3f4f5] p-3 transition-colors group-hover:bg-[#003366] group-hover:text-white">
+                            <span class="material-symbols-outlined">inventory</span>
                         </div>
-                        <span
-                            class="flex items-center gap-1 rounded-full bg-[#80f98b] px-2 py-1 text-xs font-bold text-[#006e25]"
-                        >
-                            <span
-                                class="material-symbols-outlined text-[14px]"
-                                data-icon="trending_up"
-                                >trending_up</span
-                            >
-                            +8.2%
-                        </span>
                     </div>
-                    <p
-                        class="mb-1 text-[11px] font-bold tracking-widest text-slate-400 uppercase"
-                    >
-                        Total Barang Terjual
-                    </p>
-                    <h3
-                        class="text-3xl font-extrabold tracking-tight text-[#001e40]"
-                    >
+                    <p class="mb-1 text-[11px] font-bold tracking-widest text-slate-400 uppercase">Total Barang</p>
+                    <h3 class="text-3xl font-extrabold tracking-tight text-[#001e40]">
                         {{ stats.total_barang_terjual.toLocaleString('id-ID') }}
                     </h3>
                 </div>
 
-                <div
-                    class="group rounded-xl border-l-4 border-[#006e25] bg-white p-6 shadow-[0_12px_40px_rgba(0,30,64,0.04)] transition-all duration-300 hover:shadow-lg"
-                >
+                <div class="group rounded-xl border-l-4 border-[#006e25] bg-white p-6 shadow-[0_12px_40px_rgba(0,30,64,0.04)] transition-all duration-300 hover:shadow-lg">
                     <div class="mb-4 flex items-start justify-between">
-                        <div
-                            class="rounded-lg bg-[#f3f4f5] p-3 transition-colors group-hover:bg-[#003366] group-hover:text-white"
-                        >
-                            <span
-                                class="material-symbols-outlined"
-                                data-icon="payments"
-                                >payments</span
-                            >
+                        <div class="rounded-lg bg-[#f3f4f5] p-3 transition-colors group-hover:bg-[#003366] group-hover:text-white">
+                            <span class="material-symbols-outlined">payments</span>
                         </div>
-                        <span
-                            class="flex items-center gap-1 rounded-full bg-[#80f98b] px-2 py-1 text-xs font-bold text-[#006e25]"
-                        >
-                            <span
-                                class="material-symbols-outlined text-[14px]"
-                                data-icon="trending_up"
-                                >trending_up</span
-                            >
-                            +24.0%
-                        </span>
                     </div>
-                    <p
-                        class="mb-1 text-[11px] font-bold tracking-widest text-slate-400 uppercase"
-                    >
-                        Total Pendapatan
-                    </p>
-                    <h3
-                        class="text-3xl font-extrabold tracking-tight text-[#001e40]"
-                    >
+                    <p class="mb-1 text-[11px] font-bold tracking-widest text-slate-400 uppercase">Total Pendapatan</p>
+                    <h3 class="text-3xl font-extrabold tracking-tight text-[#001e40]">
                         {{
-                            typeof stats.total_pendapatan === 'number' &&
                             stats.total_pendapatan >= 1000000000
-                                ? 'Rp ' +
-                                  (stats.total_pendapatan / 1000000000).toFixed(
-                                      1,
-                                  ) +
-                                  'B'
+                                ? 'Rp ' + (stats.total_pendapatan / 1000000000).toFixed(1) + 'B'
                                 : formatCurrency(stats.total_pendapatan)
                         }}
                     </h3>
@@ -337,273 +237,210 @@ const displayTransactions = computed(() => {
             </div>
 
             <!-- Filter Bar -->
-            <div
-                class="mb-6 flex flex-wrap items-center gap-4 rounded-xl border border-slate-200 bg-[#f3f4f5] p-5"
-            >
-                <div class="relative min-w-[250px] flex-1 md:min-w-[300px]">
-                    <span
-                        class="material-symbols-outlined absolute top-1/2 left-3 -translate-y-1/2 text-slate-400"
-                        data-icon="search"
-                        >search</span
-                    >
+            <div class="mb-6 flex flex-wrap items-center gap-4 rounded-xl border border-slate-200 bg-[#f3f4f5] p-5">
+                <div class="relative min-w-62.5 flex-1 md:min-w-75">
+                    <span class="material-symbols-outlined absolute top-1/2 left-3 -translate-y-1/2 text-slate-400">search</span>
                     <input
+                        v-model="search"
+                        @keyup.enter="applyFilters"
                         class="w-full rounded-lg border-none bg-white py-3 pr-4 pl-11 text-sm focus:ring-2 focus:ring-[#006e25]/50"
                         placeholder="Cari nama barang..."
                         type="text"
                     />
                 </div>
                 <div class="flex flex-wrap gap-3">
-                    <div
-                        class="flex items-center gap-2 rounded-lg border border-transparent bg-white px-3 py-1.5 transition-all focus-within:border-[#006e25]/30"
-                    >
-                        <span
-                            class="material-symbols-outlined text-lg text-slate-400"
-                            data-icon="calendar_today"
-                            >calendar_today</span
-                        >
-                        <input
-                            class="w-36 border-none bg-transparent p-0 text-sm font-medium focus:ring-0"
-                            type="text"
-                            value="01 Jan - 31 Jan 2024"
-                        />
-                    </div>
+                    <!-- Filter Jenis Aktivitas -->
                     <select
+                        v-model="jenis"
+                        @change="applyFilters"
                         class="cursor-pointer rounded-lg border-none bg-white px-4 py-2.5 text-sm font-medium focus:ring-2 focus:ring-[#006e25]/50"
                     >
-                        <option>Semua Status</option>
-                        <option>Dipesan</option>
-                        <option>Dibeli</option>
-                        <option>Selesai</option>
+                        <option value="all">Semua Jenis</option>
+                        <option value="pesanan">Pesanan</option>
+                        <option value="barang">Barang</option>
+                        <option value="servis">Servis</option>
                     </select>
+
                     <select
+                        v-model="status"
+                        @change="applyFilters"
                         class="cursor-pointer rounded-lg border-none bg-white px-4 py-2.5 text-sm font-medium focus:ring-2 focus:ring-[#006e25]/50"
                     >
-                        <option>Kategori</option>
-                        <option>Material</option>
-                        <option>Alat Berat</option>
-                        <option>Komponen</option>
+                        <option value="all">Semua Status</option>
+                        <option value="Dipesan">Dipesan</option>
+                        <option value="Diproses">Diproses</option>
+                        <option value="Dibeli">Dibeli</option>
+                        <option value="Selesai">Selesai</option>
                     </select>
+
+                    <select
+                        v-model="kategori"
+                        @change="applyFilters"
+                        class="cursor-pointer rounded-lg border-none bg-white px-4 py-2.5 text-sm font-medium focus:ring-2 focus:ring-[#006e25]/50"
+                    >
+                        <option value="all">Semua Kategori</option>
+                        <option value="Material">Material</option>
+                        <option value="Alat Berat">Alat Berat</option>
+                        <option value="Komponen">Komponen</option>
+                    </select>
+
                     <button
+                        @click="applyFilters"
                         class="rounded-lg bg-[#001e40] p-2.5 text-white transition-all hover:opacity-90"
                     >
-                        <span class="material-symbols-outlined" data-icon="tune"
-                            >tune</span
-                        >
+                        <span class="material-symbols-outlined">tune</span>
                     </button>
                 </div>
             </div>
 
-            <!-- Main Table -->
-            <div
-                class="overflow-hidden rounded-xl bg-white shadow-[0_12px_40px_rgba(0,30,64,0.04)]"
-            >
+            <!-- Tabel -->
+            <div class="overflow-hidden rounded-xl bg-white shadow-[0_12px_40px_rgba(0,30,64,0.04)]">
                 <div class="overflow-x-auto">
                     <table class="w-full border-collapse text-left">
                         <thead>
-                            <tr
-                                class="border-b border-[#c3c6d1]/20 bg-[#f3f4f5]"
-                            >
-                                <th
-                                    class="px-6 py-4 text-[10px] font-extrabold tracking-[0.15em] text-slate-500 uppercase"
-                                >
-                                    Nama Barang
-                                </th>
-                                <th
-                                    class="px-6 py-4 text-[10px] font-extrabold tracking-[0.15em] text-slate-500 uppercase"
-                                >
-                                    Kategori
-                                </th>
-                                <th
-                                    class="px-6 py-4 text-[10px] font-extrabold tracking-[0.15em] text-slate-500 uppercase"
-                                >
-                                    Jumlah
-                                </th>
-                                <th
-                                    class="px-6 py-4 text-[10px] font-extrabold tracking-[0.15em] text-slate-500 uppercase"
-                                >
-                                    Harga Satuan
-                                </th>
-                                <th
-                                    class="px-6 py-4 text-[10px] font-extrabold tracking-[0.15em] text-slate-500 uppercase"
-                                >
-                                    Total Harga
-                                </th>
-                                <th
-                                    class="px-6 py-4 text-[10px] font-extrabold tracking-[0.15em] text-slate-500 uppercase"
-                                >
-                                    Status
-                                </th>
-                                <th
-                                    class="px-6 py-4 text-[10px] font-extrabold tracking-[0.15em] text-slate-500 uppercase"
-                                >
-                                    Tanggal Transaksi
-                                </th>
-                                <th
-                                    class="px-6 py-4 text-right text-[10px] font-extrabold tracking-[0.15em] text-slate-500 uppercase"
-                                >
-                                    Aksi
-                                </th>
+                            <tr class="border-b border-[#c3c6d1]/20 bg-[#f3f4f5]">
+                                <th class="px-6 py-4 text-[10px] font-extrabold tracking-[0.15em] text-slate-500 uppercase">Jenis</th>
+                                <th class="px-6 py-4 text-[10px] font-extrabold tracking-[0.15em] text-slate-500 uppercase">Nama Barang</th>
+                                <th class="px-6 py-4 text-[10px] font-extrabold tracking-[0.15em] text-slate-500 uppercase">Kategori</th>
+                                <th class="px-6 py-4 text-[10px] font-extrabold tracking-[0.15em] text-slate-500 uppercase">Jumlah</th>
+                                <th class="px-6 py-4 text-[10px] font-extrabold tracking-[0.15em] text-slate-500 uppercase">Harga Satuan</th>
+                                <th class="px-6 py-4 text-[10px] font-extrabold tracking-[0.15em] text-slate-500 uppercase">Total Harga</th>
+                                <th class="px-6 py-4 text-[10px] font-extrabold tracking-[0.15em] text-slate-500 uppercase">Status</th>
+                                <th class="px-6 py-4 text-[10px] font-extrabold tracking-[0.15em] text-slate-500 uppercase">Tanggal</th>
+                                <th class="px-6 py-4 text-right text-[10px] font-extrabold tracking-[0.15em] text-slate-500 uppercase">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-[#c3c6d1]/10">
                             <tr
                                 v-for="(item, index) in displayTransactions"
-                                :key="index"
+                                :key="`${item.jenis}-${item.id}-${index}`"
                                 class="transition-colors hover:bg-[#f3f4f5]/60"
                             >
-                                <td class="px-6 py-5">
-                                    <div class="flex items-center gap-3">
-                                        <div
-                                            class="flex h-10 w-10 items-center justify-center rounded bg-[#f3f4f5] text-[#001e40]"
-                                        >
-                                            <span
-                                                class="material-symbols-outlined"
-                                                >{{ getIcon(item.bahan) }}</span
-                                            >
-                                        </div>
-                                        <span
-                                            class="font-bold text-[#001e40]"
-                                            >{{ item.nama_barang }}</span
-                                        >
-                                    </div>
-                                </td>
-                                <td
-                                    class="px-6 py-5 text-sm font-medium text-[#43474f]"
-                                >
-                                    {{ item.bahan || '-' }}
-                                </td>
-                                <td
-                                    class="px-6 py-5 text-sm font-bold text-[#001e40]"
-                                >
-                                    {{ item.jumlah }} Unit
-                                </td>
-                                <td class="px-6 py-5 text-sm text-[#43474f]">
-                                    {{
-                                        item.harga_satuan
-                                            ? formatCurrency(item.harga_satuan)
-                                            : '-'
-                                    }}
-                                </td>
-                                <td
-                                    class="px-6 py-5 text-sm font-extrabold text-[#001e40]"
-                                >
-                                    {{
-                                        item.harga_satuan
-                                            ? formatCurrency(
-                                                  item.jumlah *
-                                                      item.harga_satuan,
-                                              )
-                                            : '-'
-                                    }}
-                                </td>
+                                <!-- Jenis dengan badge berwarna -->
                                 <td class="px-6 py-5">
                                     <span
-                                        v-if="getStatus(item) === 'Selesai'"
+                                        class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-extrabold tracking-widest uppercase"
+                                        :class="getJenisBadgeClass(item.jenis)"
+                                    >
+                                        <span class="material-symbols-outlined text-[14px]">
+                                            {{ getIconByJenis(item.jenis) }}
+                                        </span>
+                                        {{ item.jenis }}
+                                    </span>
+                                </td>
+
+                                <td class="px-6 py-5">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex h-10 w-10 items-center justify-center rounded bg-[#f3f4f5] text-[#001e40]">
+                                            <span class="material-symbols-outlined">{{ getIconByJenis(item.jenis) }}</span>
+                                        </div>
+                                        <div>
+                                            <div class="font-bold text-[#001e40]">{{ item.nama_barang }}</div>
+                                            <div v-if="item.catatan" class="text-xs text-slate-500">{{ item.catatan }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="px-6 py-5 text-sm font-medium text-[#43474f]">
+                                    {{ item.kategori || '-' }}
+                                </td>
+
+                                <td class="px-6 py-5 text-sm font-bold text-[#001e40]">
+                                    {{ item.jumlah }} Unit
+                                </td>
+
+                                <td class="px-6 py-5 text-sm text-[#43474f]">
+                                    {{ formatCurrency(item.harga_satuan) }}
+                                </td>
+
+                                <td class="px-6 py-5 text-sm font-extrabold text-[#001e40]">
+                                    {{ formatCurrency(item.total_harga) }}
+                                </td>
+
+                                <td class="px-6 py-5">
+                                    <span
+                                        v-if="item.status === 'Selesai'"
                                         class="rounded-full bg-[#80f98b] px-3 py-1 text-[10px] font-extrabold tracking-widest text-[#007327] uppercase"
                                     >
                                         Selesai
                                     </span>
                                     <span
-                                        v-else-if="getStatus(item) === 'Dibeli'"
-                                        class="rounded-full bg-[#001e40]/10 px-3 py-1 text-[10px] font-extrabold tracking-widest text-[#001e40] uppercase"
+                                        v-else-if="item.status === 'Diproses'"
+                                        class="rounded-full bg-[#fef3c7] px-3 py-1 text-[10px] font-extrabold tracking-widest text-[#b45309] uppercase"
+                                    >
+                                        Dalam Proses
+                                    </span>
+                                    <span
+                                        v-else-if="item.status === 'Dibeli'"
+                                        class="rounded-full bg-blue-100 px-3 py-1 text-[10px] font-extrabold tracking-widest text-blue-800 uppercase"
                                     >
                                         Dibeli
                                     </span>
                                     <span
                                         v-else
-                                        class="rounded-full bg-[#ffdad6] px-3 py-1 text-[10px] font-extrabold tracking-widest text-[#93000a] uppercase"
+                                        class="rounded-full bg-error-container px-3 py-1 text-[10px] font-extrabold tracking-widest text-on-error-container uppercase"
                                     >
                                         Dipesan
                                     </span>
                                 </td>
+
                                 <td class="px-6 py-5 text-sm text-[#43474f]">
-                                    {{
-                                        formatDate(
-                                            item.tanggalpemesanan ||
-                                                item.tanggal_transaksi,
-                                        )
-                                    }}
+                                    {{ formatDate(item.tanggal_transaksi) }}
                                 </td>
+
                                 <td class="px-6 py-5 text-right">
                                     <button
+                                        @click="viewDetail(item)"
                                         class="rounded-lg p-2 text-[#001e40] transition-all hover:bg-[#001e40]/5"
                                     >
-                                        <span
-                                            class="material-symbols-outlined"
-                                            data-icon="visibility"
-                                            >visibility</span
-                                        >
+                                        <span class="material-symbols-outlined">visibility</span>
                                     </button>
                                 </td>
                             </tr>
 
                             <tr v-if="displayTransactions.length === 0">
-                                <td
-                                    colspan="8"
-                                    class="px-6 py-10 text-center text-slate-500"
-                                >
-                                    Belum ada riwayat transaksi.
+                                <td colspan="9" class="px-6 py-10 text-center text-slate-500">
+                                    Belum ada riwayat aktivitas.
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
-                <!-- Pagination Footer -->
-                <div
-                    class="flex flex-col items-center justify-between gap-4 border-t border-[#c3c6d1]/20 bg-[#f3f4f5]/50 px-6 py-4 md:flex-row"
-                >
-                    <p
-                        class="text-center text-xs font-bold tracking-widest text-slate-500 uppercase md:text-left"
-                    >
-                        Showing {{ displayTransactions.length }} of
-                        {{
-                            transactions?.total || stats.total_transaksi
-                        }}
-                        Transactions
+                <!-- Pagination -->
+                <div class="flex flex-col items-center justify-between gap-4 border-t border-[#c3c6d1]/20 bg-[#f3f4f5]/50 px-6 py-4 md:flex-row">
+                    <p class="text-center text-xs font-bold tracking-widest text-slate-500 uppercase md:text-left">
+                        Menampilkan {{ displayTransactions.length }} dari {{ transactions.total }} Aktivitas
                     </p>
                     <div class="flex items-center gap-2">
                         <button
+                            @click="goToPage(transactions.current_page - 1)"
+                            :disabled="transactions.current_page === 1"
                             class="p-2 text-slate-400 transition-colors hover:text-[#001e40] disabled:opacity-30"
-                            :disabled="transactions?.current_page === 1"
                         >
-                            <span
-                                class="material-symbols-outlined"
-                                data-icon="chevron_left"
-                                >chevron_left</span
-                            >
+                            <span class="material-symbols-outlined">chevron_left</span>
                         </button>
                         <div class="flex items-center gap-1">
                             <button
-                                class="h-8 w-8 rounded-lg bg-[#001e40] text-xs font-bold text-white shadow-md shadow-[#001e40]/20"
+                                v-for="p in Math.min(transactions.last_page, 5)"
+                                :key="p"
+                                @click="goToPage(p)"
+                                class="h-8 w-8 rounded-lg text-xs font-bold transition-all"
+                                :class="
+                                    p === transactions.current_page
+                                        ? 'bg-[#001e40] text-white shadow-md shadow-[#001e40]/20'
+                                        : 'hover:bg-[#f3f4f5]'
+                                "
                             >
-                                1
-                            </button>
-                            <button
-                                class="h-8 w-8 rounded-lg text-xs font-bold transition-all hover:bg-[#f3f4f5]"
-                            >
-                                2
-                            </button>
-                            <button
-                                class="h-8 w-8 rounded-lg text-xs font-bold transition-all hover:bg-[#f3f4f5]"
-                            >
-                                3
-                            </button>
-                            <span class="px-2 text-slate-400">...</span>
-                            <button
-                                class="h-8 w-8 rounded-lg text-xs font-bold transition-all hover:bg-[#f3f4f5]"
-                            >
-                                24
+                                {{ p }}
                             </button>
                         </div>
                         <button
-                            class="p-2 text-slate-400 transition-colors hover:text-[#001e40]"
+                            @click="goToPage(transactions.current_page + 1)"
+                            :disabled="transactions.current_page === transactions.last_page"
+                            class="p-2 text-slate-400 transition-colors hover:text-[#001e40] disabled:opacity-30"
                         >
-                            <span
-                                class="material-symbols-outlined"
-                                data-icon="chevron_right"
-                                >chevron_right</span
-                            >
+                            <span class="material-symbols-outlined">chevron_right</span>
                         </button>
                     </div>
                 </div>
@@ -619,13 +456,8 @@ const displayTransactions = computed(() => {
     font-family: 'Inter', sans-serif;
 }
 .material-symbols-outlined {
-    font-variation-settings:
-        'FILL' 0,
-        'wght' 400,
-        'GRAD' 0,
-        'opsz' 24;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
-
 footer {
     background-color: #222;
     color: white;

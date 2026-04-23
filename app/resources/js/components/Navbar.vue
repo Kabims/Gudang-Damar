@@ -15,8 +15,7 @@ function handleLogout() {
             <li><Link href="/barang" id="buttonPenyimpanan">Penyimpanan</Link></li>
             <li><Link href="/servis" id="buttonServis">Servis</Link></li>
             <li><Link href="/pesanan" id="buttonPesanan">Pesanan</Link></li>
-            <li><Link href="/grafik" id="buttonGrafik">Grafik</Link></li>
-            <li><Link href="/image-generation" id="buttonImageGeneration">Image Generation</Link></li>
+            <li><Link href="/riwayat" id="buttonGrafik">Aktivitas</Link></li>
             <li><a href="#" id="logout-button" @click.prevent="handleLogout">Log Out</a></li>
         </ul>
     </header>

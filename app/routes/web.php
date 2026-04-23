@@ -9,6 +9,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\ServisController;
 use App\Http\Controllers\PesananController;
+use App\Http\Controllers\AktivitasController;
 
 Route::inertia('/', 'Welcome', [
     'canRegister' => Features::enabled(Features::registration()),
@@ -26,9 +27,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('barang', BarangController::class);
 
-    Route::get('/riwayat', function () {
-        return inertia('riwayat/Index');
-    });
+  
 
     Route::get('/servis',                  [ServisController::class, 'index'])   ->name('servis.index');
     Route::post('/servis',                 [ServisController::class, 'store'])   ->name('servis.store');
@@ -48,6 +47,20 @@ Route::middleware(['auth'])->group(function () {
         return view('test-image');
     });
 });
+
+Route::prefix('riwayat')->name('riwayat.')->group(function () {
+    // Halaman utama Riwayat (Riwayat/Index.vue)
+    Route::get('/', [AktivitasController::class, 'index'])->name('index');
+ 
+    // Export ke CSV
+    Route::get('/export', [AktivitasController::class, 'export'])->name('export');
+ 
+    // Detail 1 aktivitas (jenis: pesanan/barang/servis)
+    Route::get('/{jenis}/{id}', [AktivitasController::class, 'show'])
+        ->where('jenis', 'pesanan|barang|servis')
+        ->name('show');
+});
+
 
 // Google OAuth Routes (no auth needed)
 Route::get('/auth/google/redirect', [SocialiteController::class, 'redirect'])->name('auth.google.redirect');
