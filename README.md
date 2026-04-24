@@ -74,9 +74,10 @@ GOOGLE_REDIRECT_URI=http://localhost/auth/google/callback
 composer install
 npm install
 ```
-### Step 6. Generate app key
+### Step 6. Setup the project
 ```
 php artisan key:generate
+php artisan storage:link
 ```
 
 ### Step 7. Uncomment this in php.ini
