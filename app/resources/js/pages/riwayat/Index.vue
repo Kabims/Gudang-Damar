@@ -273,7 +273,8 @@ const exportData = () => {
                         <option value="all">Semua Status</option>
                         <option value="Dipesan">Dipesan</option>
                         <option value="Diproses">Diproses</option>
-                        <option value="Dibeli">Dibeli</option>
+                        <option value="Dibeli">Stok Masuk</option>
+                        <option value="Terjual">Terjual</option>
                         <option value="Selesai">Selesai</option>
                     </select>
 
@@ -282,7 +283,7 @@ const exportData = () => {
                     <!-- BUTTON GRAFIK -->
                     <Link 
                         href="/grafik"
-                        class="flex items-center gap-2 bg-surface-container-lowest border border-slate-200 text-primary px-4 py-2.5 rounded-lg font-bold text-sm hover:bg-slate-50 transition-all"
+                        class="flex items-center gap-2 bg-white border border-slate-200 text-primary px-4 py-2.5 rounded-lg font-bold text-sm hover:bg-slate-50 transition-all"
                     >
                         <span class="material-symbols-outlined text-lg">leaderboard</span>
                         Grafik
@@ -302,14 +303,14 @@ const exportData = () => {
                     <table class="w-full border-collapse text-left">
                         <thead>
                             <tr class="border-b border-[#c3c6d1]/20 bg-[#f3f4f5]">
-                                <th class="px-6 py-4 text-[10px] font-extrabold tracking-[0.15em] text-slate-500 uppercase">Jenis</th>
-                                <th class="px-6 py-4 text-[10px] font-extrabold tracking-[0.15em] text-slate-500 uppercase">Nama Barang</th>
-                                <th class="px-6 py-4 text-[10px] font-extrabold tracking-[0.15em] text-slate-500 uppercase">Jumlah</th>
-                                <th class="px-6 py-4 text-[10px] font-extrabold tracking-[0.15em] text-slate-500 uppercase">Harga Satuan</th>
-                                <th class="px-6 py-4 text-[10px] font-extrabold tracking-[0.15em] text-slate-500 uppercase">Total Harga</th>
-                                <th class="px-6 py-4 text-[10px] font-extrabold tracking-[0.15em] text-slate-500 uppercase">Status</th>
-                                <th class="px-6 py-4 text-[10px] font-extrabold tracking-[0.15em] text-slate-500 uppercase">Tanggal</th>
-                                <th class="px-6 py-4 text-right text-[10px] font-extrabold tracking-[0.15em] text-slate-500 uppercase">Lihat</th>
+                                <th class="px-6 py-4 w-[12%] text-xs font-extrabold tracking-[0.15em] text-slate-500 uppercase pl-13">Jenis</th>
+                                <th class="px-6 py-4 w-[28%] text-xs font-extrabold tracking-[0.15em] text-slate-500 uppercase">Nama Barang</th>
+                                <th class="px-6 py-4 w-[10%] text-xs font-extrabold tracking-[0.15em] text-slate-500 uppercase">Jumlah</th>
+                                <th class="px-6 py-4 w-[15%] text-xs font-extrabold tracking-[0.15em] text-slate-500 uppercase">Harga Satuan</th>
+                                <th class="px-6 py-4 w-[15%] text-xs font-extrabold tracking-[0.15em] text-slate-500 uppercase">Total Harga</th>
+                                <th class="px-6 py-4 w-[10%] text-xs font-extrabold tracking-[0.15em] text-slate-500 uppercase">Status</th>
+                                <th class="px-6 py-4 w-[10%] text-xs font-extrabold tracking-[0.15em] text-slate-500 uppercase">Tanggal</th>
+                                
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-[#c3c6d1]/10">
@@ -353,6 +354,7 @@ const exportData = () => {
                                 <!-- Harga Satuan (null untuk ubah stok) -->
                                 <td class="px-6 py-5 text-sm text-[#43474f]">
                                     {{ formatCurrency(item.harga_satuan) }}
+                                    
                                 </td>
 
                                 <!-- Total Harga (null untuk ubah stok) -->
@@ -390,18 +392,11 @@ const exportData = () => {
                                 </td>
 
                                 <!-- Aksi -->
-                                <td class="px-6 py-5 text-right">
-                                    <button
-                                        @click="viewDetail(item)"
-                                        class="rounded-lg p-2 text-[#001e40] transition-all hover:bg-[#001e40]/5"
-                                    >
-                                        <span class="material-symbols-outlined">visibility</span>
-                                    </button>
-                                </td>
+                                
                             </tr>
 
                             <tr v-if="displayTransactions.length === 0">
-                                <td colspan="9" class="px-6 py-10 text-center text-slate-500">
+                                <td colspan="8" class="px-6 py-10 text-center text-slate-500">
                                     Belum ada riwayat aktivitas.
                                 </td>
                             </tr>
