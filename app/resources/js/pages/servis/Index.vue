@@ -259,6 +259,7 @@ const totalPendapatan = computed(() => {
                       <span class="material-symbols-outlined">check</span>
                     </button>
                     <button
+                      v-if="isBelumSelesai(servis.tanggalterkirim)"
                       class="btn-aksi btn-edit"
                       title="Edit"
                       @click="openEdit(servis)"

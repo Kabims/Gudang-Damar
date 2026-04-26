@@ -11,7 +11,7 @@ withDefaults(
     },
 );
 
-const dashboardUrl = '/barang';
+const dashboardUrl = '/riwayat';
 </script>
 
 <template>
@@ -20,9 +20,9 @@ const dashboardUrl = '/barang';
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
     </Head>
 
-    <div class="min-h-screen bg-[#f9f9f9] text-stone-900 antialiased selection:bg-[#f3c99b] selection:text-stone-900">
+    <div class="welcome-theme min-h-screen bg-[#f9f9f9] text-stone-900 antialiased selection:bg-[#f3c99b] selection:text-stone-900">
         <!-- TopNavBar Component -->
-        <nav class="fixed top-0 w-full z-50 bg-[#8b5a2b]/90 backdrop-blur-md shadow-sm">
+        <nav class="fixed top-0 w-full z-50 bg-[#66ACE6]/90 backdrop-blur-md shadow-sm">
             <div class="max-w-2560 mx-auto flex justify-between items-center px-8 h-20">
                 <div class="text-2xl font-bold tracking-tighter text-white">
                     Gudang Damar
@@ -31,22 +31,23 @@ const dashboardUrl = '/barang';
                 <div class="flex items-center space-x-4 text-white">
                     <Link
                         v-if="$page.props.auth.user"
+                        
                         :href="dashboardUrl"
-                        class="inline-block rounded-sm border border-stone-300 px-5 py-1.5 text-sm leading-normal text-white hover:border-stone-400 transition-colors"
+                        class="inline-flex items-center justify-center px-5 py-2 text-sm font-semibold bg-white text-[#4F9BD1] rounded-md hover:bg-[#EAF4FD] transition-colors shadow-sm"
                     >
                         Dashboard
                     </Link>
                     <template v-else>
                         <Link
                             :href="login()"
-                            class="inline-block rounded-sm border border-transparent px-5 py-1.5 text-sm leading-normal text-white hover:border-stone-300 transition-colors"
+                            class="text-sm text-white/90 hover:text-white transition-colors"
                         >
                             Log in
                         </Link>
                         <Link
                             v-if="canRegister"
                             :href="register()"
-                            class="inline-block rounded-sm border border-transparent px-5 py-1.5 text-sm leading-normal text-white hover:border-stone-400 transition-colors"
+                            class="inline-flex items-center justify-center px-5 py-2 text-sm font-semibold bg-white text-[#4F9BD1] rounded-md hover:bg-[#EAF4FD] transition-colors shadow-sm"
                         >
                             Register
                         </Link>
@@ -61,22 +62,22 @@ const dashboardUrl = '/barang';
         <main class="pt-20">
             <!-- Hero Section -->
             <section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-section-gap flex flex-col md:flex-row items-center gap-gutter min-h-204.75">
-            <div class="w-full md:w-1/2 space-y-6 z-10 pr-0 md:pr-12">
-            <h1 class="font-display-xl text-display-xl text-on-surface">
-                                Peralatan Dapur Berkualitas untuk Masakan Sempurna
-                            </h1>
-            <p class="font-body-lg text-body-lg text-on-surface-variant max-w-lg">
-                                Lengkapi dapur Anda dengan peralatan masak berkesan custom. Desain minimalis, fungsionalitas maksimal.
-                            </p>
-            <div class="pt-4">
-            <a class="inline-flex items-center justify-center px-8 py-4 bg-[#8b5a2b] text-white font-label-sm text-label-sm uppercase tracking-wider rounded-DEFAULT hover:bg-[#78583b] transition-colors shadow-sm hover:shadow-md" href="#produk">
-                                    Jelajahi Koleksi
-                                </a>
-            </div>
-            </div>
-            <div class="w-full md:w-1/2 relative h-125 md:h-175 rounded-xl overflow-hidden shadow-[0_20px_40px_-15px_rgba(17,17,17,0.06)]">
-            <img alt="High-quality cooking utensils" class="absolute inset-0 w-full h-full object-cover" data-alt="Modern kitchen interior with sleek minimal wooden and stainless steel cooking utensils neatly arranged on a clean marble countertop, soft natural daylight, warm inviting atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJPUpY3d-2v4U0vx3WpCAGV4kF_010O4MLILB97vTQprd3PTx51NN-8xJ-9_l7U8HOaSTbjfw1KfimKecPtSQpqUYInts5b3jrmKVYgIwwc-1O2-mVrAxx7P_66aRMW7Sp7PgNklmaK_uLMjY2PfRw2bs-8sznozN_cebAT2Kt53SbaPgsrG-4dOgnI9GNswY9HGxoAuJ_jbr2E3cVBQAGAFiwykCto3G4GJ6oJRQFZQk4qwtQB99rdcXMrtqsPJE8vBbJV_-E1Vo"/>
-            </div>
+                <div class="w-full md:w-1/2 space-y-6 z-10 pr-0 md:pr-12">
+                <h1 class="font-display-xl text-display-xl text-on-surface">
+                                    Peralatan Dapur Berkualitas untuk Masakan Sempurna
+                                </h1>
+                <p class="font-body-lg text-body-lg text-on-surface-variant max-w-lg">
+                                    Lengkapi dapur Anda dengan peralatan masak berkesan custom. Desain minimalis, fungsionalitas maksimal.
+                                </p>
+                <div class="pt-4">
+                <a class="inline-flex items-center justify-center px-8 py-4 bg-[#66ACE6] text-white font-label-sm text-label-sm uppercase tracking-wider rounded-DEFAULT hover:bg-[#4F9BD1] transition-colors shadow-sm hover:shadow-md" href="#produk">
+                                        Jelajahi Koleksi
+                                    </a>
+                </div>
+                </div>
+                <div class="w-full md:w-1/2 relative h-125 md:h-175 rounded-xl overflow-hidden shadow-[0_20px_40px_-15px_rgba(17,17,17,0.06)]">
+                <img alt="High-quality cooking utensils" class="absolute inset-0 w-full h-full object-cover" data-alt="Modern kitchen interior with sleek minimal wooden and stainless steel cooking utensils neatly arranged on a clean marble countertop, soft natural daylight, warm inviting atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJPUpY3d-2v4U0vx3WpCAGV4kF_010O4MLILB97vTQprd3PTx51NN-8xJ-9_l7U8HOaSTbjfw1KfimKecPtSQpqUYInts5b3jrmKVYgIwwc-1O2-mVrAxx7P_66aRMW7Sp7PgNklmaK_uLMjY2PfRw2bs-8sznozN_cebAT2Kt53SbaPgsrG-4dOgnI9GNswY9HGxoAuJ_jbr2E3cVBQAGAFiwykCto3G4GJ6oJRQFZQk4qwtQB99rdcXMrtqsPJE8vBbJV_-E1Vo"/>
+                </div>
             </section>
             <!-- Produk Unggulan Section -->
             <section class="bg-surface-container-low py-section-gap" id="produk">
@@ -112,7 +113,7 @@ const dashboardUrl = '/barang';
 
             <!-- CONTENT -->
             <div class="px-4 pb-5">
-                <h3 class="text-[18px] font-semibold text-stone-900 group-hover:text-[#8b5a2b] transition-colors">
+                <h3 class="text-[18px] font-semibold text-stone-900 group-hover:text-[#1371be] transition-colors">
                 Set Panci & Wajan
                 </h3>
 
@@ -146,7 +147,7 @@ const dashboardUrl = '/barang';
 
             <!-- CONTENT -->
             <div class="px-4 pb-5">
-                <h3 class="text-[18px] font-semibold text-stone-900 group-hover:text-[#8b5a2b] transition-colors">
+                <h3 class="text-[18px] font-semibold text-stone-900 group-hover:text-[#1371be] transition-colors">
                 Loyang Kue
                 </h3>
 
@@ -180,7 +181,7 @@ const dashboardUrl = '/barang';
 
             <!-- CONTENT -->
             <div class="px-4 pb-5">
-                <h3 class="text-[18px] font-semibold text-stone-900 group-hover:text-[#8b5a2b] transition-colors">
+                <h3 class="text-[18px] font-semibold text-stone-900 group-hover:text-[#1371be] transition-colors">
                 Dandang Kukus
                 </h3>
 
@@ -269,7 +270,7 @@ const dashboardUrl = '/barang';
 
                 <!-- KANAN: CARD AI -->
                 <div class="right-section w-full lg:w-120 shrink-0 lg:ml-auto">
-                    <div class="relative bg-linear-to-br from-[#b8834a] via-[#8b5a2b] rounded-3xl p-6 sm:p-8 flex items-center overflow-hidden shadow-xl w-full">
+                    <div class="relative bg-linear-to-br from-[#8FC4F0] via-[#66ACE6] to-[#4F9BD1] rounded-3xl p-6 sm:p-8 flex items-center overflow-hidden shadow-xl w-full">
                         
                         <div class="relative z-10 flex-1 w-[55%]">
                             <!-- Badge -->
@@ -286,8 +287,8 @@ const dashboardUrl = '/barang';
                             <div class="space-y-5">
                                 <!-- Feature 1 -->
                                 <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-full bg-[#f3c99b] flex items-center justify-center shrink-0 shadow-sm">
-                                        <span class="material-symbols-outlined text-stone-800 text-[20px]">hub</span>
+                                    <div class="w-10 h-10 rounded-full bg-[#EAF4FD] flex items-center justify-center shrink-0 shadow-sm">
+                                        <span class="material-symbols-outlined text-[#4F9BD1] text-[20px]">hub</span>
                                     </div>
                                     <div>
                                         <h4 class="text-white text-[13px] font-bold leading-tight mb-0.5">AI Preview</h4>
@@ -297,8 +298,8 @@ const dashboardUrl = '/barang';
                                 
                                 <!-- Feature 2 -->
                                 <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-full bg-[#f3c99b] flex items-center justify-center shrink-0 shadow-sm">
-                                        <span class="material-symbols-outlined text-stone-800 text-[20px]">monetization_on</span>
+                                    <div class="w-10 h-10 rounded-full bg-[#EAF4FD] flex items-center justify-center shrink-0 shadow-sm">
+                                        <span class="material-symbols-outlined text-[#4F9BD1] text-[20px]">monetization_on</span>
                                     </div>
                                     <div>
                                         <h4 class="text-white text-[13px] font-bold leading-tight mb-0.5">Transparent Pricing</h4>
@@ -308,8 +309,8 @@ const dashboardUrl = '/barang';
                                 
                                 <!-- Feature 3 -->
                                 <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-full bg-[#f3c99b] flex items-center justify-center shrink-0 shadow-sm">
-                                        <span class="material-symbols-outlined text-stone-800 text-[20px]">support_agent</span>
+                                    <div class="w-10 h-10 rounded-full bg-[#EAF4FD] flex items-center justify-center shrink-0 shadow-sm">
+                                        <span class="material-symbols-outlined text-[#4F9BD1] text-[20px]">support_agent</span>
                                     </div>
                                     <div>
                                         <h4 class="text-white text-[13px] font-bold leading-tight mb-0.5">Konsultasi Desain</h4>
@@ -321,28 +322,28 @@ const dashboardUrl = '/barang';
                         
                         <!-- Graphic Right Side -->
                         <div class="relative z-10 w-[45%] flex justify-end pl-2">
-                            <div class="relative w-37.5 h-42.5 bg-[#fdfdfd] rounded-3xl shadow-lg flex flex-col items-center justify-center border border-white/50">
+                            <div class="relative w-37.5 h-42.5 bg-linear-to-br from-[#F4F9FE] to-[#EAF4FD] rounded-3xl shadow-lg flex flex-col items-center justify-center border border-white/50">
                                 
                                 <!-- Cooking Icon (Replacing Avatar) -->
                                 <div class="relative z-10 flex flex-col items-center mt-4 mb-2">
-                                    <div class="w-18 h-18 bg-[#f3c99b] rounded-full border-2 border-[#1a1a1a] flex items-center justify-center relative z-10 shadow-inner">
+                                    <div class="w-18 h-18 bg-[#ffffff] rounded-full border-2 border-[#66ACE6]/30 flex items-center justify-center relative z-10 shadow-inner">
                                         <span class="material-symbols-outlined text-[#1a1a1a] text-[36px]">soup_kitchen</span>
                                     </div>
                                 </div>
 
                                 <!-- Floating badge 1 (Top right) -->
                                 <div class="absolute -top-3 -right-3 w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-xl border border-stone-200">
-                                    <span class="material-symbols-outlined text-[#8b5a2b] text-[20px]">draw</span>
+                                    <span class="material-symbols-outlined text-[#4F9BD1] text-[20px]">draw</span>
                                 </div>
 
                                 <!-- Floating badge 2 (Left middle) -->
                                 <div class="absolute top-[35%] -left-5 w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-xl border border-stone-200">
-                                    <span class="material-symbols-outlined text-[#8b5a2b] text-[20px]">image</span>
+                                    <span class="material-symbols-outlined text-[#4F9BD1] text-[20px]">image</span>
                                 </div>
 
                                 <!-- Floating badge 3 (Bottom left) -->
                                 <div class="absolute bottom-5 -left-4 w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-xl border border-stone-200">
-                                    <span class="material-symbols-outlined text-[#8b5a2b] text-[20px]">show_chart</span>
+                                    <span class="material-symbols-outlined text-[#4F9BD1] text-[20px]">show_chart</span>
                                 </div>
 
                                 <!-- Plant Graphic (Bottom Right) -->
@@ -420,7 +421,8 @@ const dashboardUrl = '/barang';
             </section>
 
             <!-- CTA Section -->
-            <section class="py-section-gap bg-[#45280d] relative overflow-hidden">
+            <section class="py-section-gap bg-[#66ACE6] via-[#4F9BD1] to-[#3B82C4] relative overflow-hidden">
+            <div class="absolute inset-0 bg-black/10"></div>
             <div class="absolute inset-0 opacity-10 pointer-events-none">
             <img alt="Background texture" class="w-full h-full object-cover" data-alt="Subtle dark moody kitchen environment, softly blurred out background, dim warm light reflecting off dark wood and steel surfaces" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgXMKs3bkf0KYqaVgUrfRAiWcMLsxdEpw2HCJKVTQdmX_1eYM3OF3Knv0LF-QPZzFeWQ_tkaH8YUSIpZZTfpUj_UfVrz29lGawJdmhmnqTEbKJl9fTIK7xwiwJ36NAbYWRo93twdl5u_8W3dCzpbEBJxULv5RLFfyfbSn5Sc8FnP5J_WE2VqwK5KG64hxV1GptQ52vflJVzGIfe-lnys0xsfy9pzRxz0cdCF7GBAhJcRS9ZBVRdAPsWAv8jPSQdNIrxTLfXCE7KgI"/>
             </div>
@@ -429,10 +431,10 @@ const dashboardUrl = '/barang';
                                 Lengkapi Peralatan Dapur Anda Sekarang
                             </h2>
             <div class="flex flex-col sm:flex-row justify-center gap-4 mt-12">
-            <a class="inline-flex items-center justify-center px-8 py-4 bg-[#f4f1ee] text-stone-800 font-label-sm text-label-sm uppercase tracking-wider rounded-DEFAULT hover:bg-secondary transition-colors" href="#">
+            <a class="inline-flex items-center justify-center px-8 py-4 bg-white text-[#4F9BD1] font-label-sm text-label-sm uppercase tracking-wider rounded-DEFAULT hover:bg-[#EAF4FD] transition-colors" href="#">
                                     Belanja Sekarang
                                 </a>
-            <a class="inline-flex items-center justify-center px-8 py-4 bg-transparent border border-white text-white font-label-sm text-label-sm uppercase tracking-wider rounded-DEFAULT hover:bg-stone-900/10 transition-colors" href="#">
+            <a class="inline-flex items-center justify-center px-8 py-4 bg-transparent border border-white text-white font-label-sm text-label-sm uppercase tracking-wider rounded-DEFAULT hover:bg-white/10  transition-colors" href="#">
                                     Hubungi Kami
                                 </a>
             </div>
@@ -485,6 +487,154 @@ const dashboardUrl = '/barang';
 
 <style scoped>
 body { font-family: 'Inter', sans-serif; }
+
+.welcome-theme {
+    --color-on-surface-variant: #444748;
+    --color-secondary: #78583b;
+    --color-tertiary: #14100b;
+    --color-surface-container-low: #e8edf2;
+    --color-secondary-fixed-dim: #e8bf9b;
+    --color-primary-container: #262626;
+    --color-error-container: #ffdad6;
+    --color-surface-tint: #5f5e5e;
+    --color-on-primary-fixed-variant: #474746;
+    --color-tertiary-container: #2a2520;
+    --color-on-primary-container: #8e8d8c;
+    --color-on-secondary-container: #4F9BD1;
+    --color-on-secondary-fixed: #2c1602;
+    --color-tertiary-fixed-dim: #cec5bc;
+    --color-on-surface: #1a1c1c;
+    --color-on-secondary: #ffffff;
+    --color-primary-fixed: #e4e2e1;
+    --color-on-secondary-fixed-variant: #5e4126;
+    --color-on-error-container: #93000a;
+    --color-on-tertiary-container: #938c84;
+    --color-surface: #f9f9f9;
+    --color-surface-bright: #f9f9f9;
+    --color-surface-container-lowest: #ffffff;
+    --color-inverse-on-surface: #f0f1f1;
+    --color-background-landing: #f9f9f9;
+    --color-primary-fixed-dim: #c8c6c5;
+    --color-inverse-primary: #c8c6c5;
+    --color-surface-dim: #dadada;
+    --color-on-error: #ffffff;
+    --color-inverse-surface: #2f3131;
+    --color-on-background: #1a1c1c;
+    --color-outline-variant: #c4c7c7;
+    --color-on-primary: #ffffff;
+    --color-surface-container-high: #e8e8e8;
+    --color-secondary-container: #EAF4FD;
+    --color-surface-container: #eeeeee;
+    --color-surface-container-highest: #e2e2e2;
+    --color-error: #ba1a1a;
+    --color-primary: #111111;
+    --color-outline: #747878;
+    --color-on-tertiary: #ffffff;
+    --color-on-tertiary-fixed: #1f1b16;
+    --color-surface-variant: #e2e2e2;
+    --color-on-primary-fixed: #1b1c1c;
+    --color-tertiary-fixed: #ebe1d8;
+    --color-secondary-fixed: #ffdcc0;
+    --color-on-tertiary-fixed-variant: #4c463f;
+
+    --spacing-gutter: 24px;
+    --spacing-section-gap: 120px;
+    --spacing-container-max: 1280px;
+    --spacing-margin-mobile: 16px;
+    --spacing-base: 8px;
+    --spacing-margin-desktop: 64px;
+
+    --font-body-lg: Inter, sans-serif;
+    --font-body-md: Inter, sans-serif;
+    --font-label-sm: Inter, sans-serif;
+    --font-headline-md: Inter, sans-serif;
+    --font-display-xl: Inter, sans-serif;
+    --font-headline-lg: Inter, sans-serif;
+
+    --text-body-lg: 18px;
+    --text-body-lg--line-height: 28px;
+    --text-body-lg--font-weight: 400;
+
+    --text-body-md: 16px;
+    --text-body-md--line-height: 24px;
+    --text-body-md--font-weight: 400;
+
+    --text-label-sm: 12px;
+    --text-label-sm--line-height: 16px;
+    --text-label-sm--letter-spacing: 0.05em;
+    --text-label-sm--font-weight: 600;
+
+    --text-headline-md: 24px;
+    --text-headline-md--line-height: 32px;
+    --text-headline-md--font-weight: 500;
+
+    --text-display-xl: 64px;
+    --text-display-xl--line-height: 72px;
+    --text-display-xl--letter-spacing: -0.02em;
+    --text-display-xl--font-weight: 600;
+
+    --text-headline-lg: 32px;
+    --text-headline-lg--line-height: 40px;
+    --text-headline-lg--letter-spacing: -0.01em;
+    --text-headline-lg--font-weight: 500;
+}
+
+.welcome-theme .text-on-surface { color: var(--color-on-surface); }
+.welcome-theme .text-on-surface-variant { color: var(--color-on-surface-variant); }
+.welcome-theme .bg-surface-container-low { background-color: var(--color-surface-container-low); }
+.welcome-theme .bg-surface { background-color: var(--color-surface); }
+.welcome-theme .bg-secondary-container { background-color: var(--color-secondary-container); }
+.welcome-theme .text-on-secondary-container { color: var(--color-on-secondary-container); }
+.welcome-theme .hover\:bg-secondary:hover { background-color: var(--color-secondary); }
+
+.welcome-theme .font-display-xl { font-family: var(--font-display-xl); }
+.welcome-theme .font-body-lg { font-family: var(--font-body-lg); }
+.welcome-theme .font-label-sm { font-family: var(--font-label-sm); }
+.welcome-theme .font-headline-lg { font-family: var(--font-headline-lg); }
+.welcome-theme .font-body-md { font-family: var(--font-body-md); }
+.welcome-theme .font-headline-md { font-family: var(--font-headline-md); }
+
+.welcome-theme .text-display-xl {
+    font-size: var(--text-display-xl);
+    line-height: var(--text-display-xl--line-height);
+    letter-spacing: var(--text-display-xl--letter-spacing);
+    font-weight: var(--text-display-xl--font-weight);
+}
+.welcome-theme .text-body-lg {
+    font-size: var(--text-body-lg);
+    line-height: var(--text-body-lg--line-height);
+    font-weight: var(--text-body-lg--font-weight);
+}
+.welcome-theme .text-label-sm {
+    font-size: var(--text-label-sm);
+    line-height: var(--text-label-sm--line-height);
+    letter-spacing: var(--text-label-sm--letter-spacing);
+    font-weight: var(--text-label-sm--font-weight);
+}
+.welcome-theme .text-headline-lg {
+    font-size: var(--text-headline-lg);
+    line-height: var(--text-headline-lg--line-height);
+    letter-spacing: var(--text-headline-lg--letter-spacing);
+    font-weight: var(--text-headline-lg--font-weight);
+}
+.welcome-theme .text-body-md {
+    font-size: var(--text-body-md);
+    line-height: var(--text-body-md--line-height);
+    font-weight: var(--text-body-md--font-weight);
+}
+.welcome-theme .text-headline-md {
+    font-size: var(--text-headline-md);
+    line-height: var(--text-headline-md--line-height);
+    font-weight: var(--text-headline-md--font-weight);
+}
+
+.welcome-theme .max-w-container-max { max-width: var(--spacing-container-max); }
+.welcome-theme .px-margin-mobile { padding-left: var(--spacing-margin-mobile); padding-right: var(--spacing-margin-mobile); }
+@media (min-width: 768px) {
+    .welcome-theme .md\:px-margin-desktop { padding-left: var(--spacing-margin-desktop); padding-right: var(--spacing-margin-desktop); }
+}
+.welcome-theme .py-section-gap { padding-top: var(--spacing-section-gap); padding-bottom: var(--spacing-section-gap); }
+.welcome-theme .gap-gutter { gap: var(--spacing-gutter); }
 
 /* CSS from Landing.html */
 .container-landing {

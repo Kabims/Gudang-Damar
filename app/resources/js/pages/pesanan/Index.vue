@@ -325,6 +325,7 @@ const hapusPesanan = (id) => {
               Tandai Selesai
             </button>
             <Link
+              v-if="!p.tanggalterkirim"
               :href="`/pesanan/${p.id_pesanan}/edit`"
               class="btn-action btn-edit"
               title="Edit"

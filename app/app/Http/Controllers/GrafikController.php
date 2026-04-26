@@ -79,15 +79,15 @@ class GrafikController extends Controller
             ? round((($revenueThisMonth - $revenueLastMonth) / $revenueLastMonth) * 100, 1)
             : 0;
 
-        // ── YTD Growth ──────────────────────────────────────────────────────
-        $revenueYTD      = $this->getTotalRevenue(Carbon::create($thisYear, 1, 1), $now);
-        $revenueLastYTD  = $this->getTotalRevenue(
-            Carbon::create($lastYear, 1, 1),
-            Carbon::create($lastYear, $now->month, $now->day)
+        // ── YoY Growth (bulan ini vs bulan yang sama tahun lalu) ──────────────
+        $revenueThisMonthFull = $revenueThisMonth; // sudah dihitung di atas
+        $revenueSameMonthLastYear = $this->getTotalRevenue(
+            $now->copy()->subYear()->startOfMonth(),  // tgl 1 bulan ini tahun lalu
+            $now->copy()->subYear()->endOfMonth()     // akhir bulan ini tahun lalu
         );
 
-        $ytdGrowth = $revenueLastYTD > 0
-            ? round((($revenueYTD - $revenueLastYTD) / $revenueLastYTD) * 100, 1)
+        $oneYearGrowth = $revenueSameMonthLastYear > 0
+            ? round((($revenueThisMonthFull - $revenueSameMonthLastYear) / $revenueSameMonthLastYear) * 100, 1)
             : 0;
 
         // ── Peak Revenue Period ─────────────────────────────────────────────
@@ -96,7 +96,7 @@ class GrafikController extends Controller
         return [
             'totalRevenue'        => $revenueThisMonth,
             'revenueChangePercent'=> $revenueChangePercent,
-            'ytdGrowth'           => $ytdGrowth,
+            'oneYearGrowth'       => $oneYearGrowth,
             'peakPeriod'          => $peak['label'],   // mis. "Q3 '24"
             'peakRevenue'         => $peak['revenue'],
         ];
@@ -189,10 +189,26 @@ class GrafikController extends Controller
         }
         unset($bucket);
 
+        // ── Trend: selisih persentase bucket pertama vs terakhir ──────────
+        $trendPercent = null; // null = tidak ditampilkan (misal 1D)
+        if ($period !== '1D' && count($buckets) >= 2) {
+            $firstRevenue = $buckets[0]['revenue'];
+            $lastRevenue  = $buckets[count($buckets) - 1]['revenue'];
+            if ($firstRevenue > 0) {
+                $trendPercent = round((($lastRevenue - $firstRevenue) / $firstRevenue) * 100, 2);
+                $trendPercent = max(-200000, min(200000, $trendPercent));
+            } elseif ($lastRevenue > 0) {
+                $trendPercent = 100.0;
+            } else {
+                $trendPercent = 0;
+            }
+        }
+
         return [
-            'buckets'    => $buckets,
-            'maxRevenue' => $maxRevenue,
-            'yAxisLabels'=> $this->buildYAxisLabels($maxRevenue),
+            'buckets'      => $buckets,
+            'maxRevenue'   => $maxRevenue,
+            'yAxisLabels'  => $this->buildYAxisLabels($maxRevenue),
+            'trendPercent' => $trendPercent,
         ];
     }
 
@@ -210,7 +226,7 @@ class GrafikController extends Controller
 
         switch ($period) {
             case '1D':
-                for ($h = 0; $h < 24; $h++) {
+                for ($h = 7; $h <= 17; $h++) {
                     $from = $now->copy()->startOfDay()->addHours($h);
                     $to   = $from->copy()->addHour()->subSecond();
                     $buckets[] = [
@@ -261,7 +277,7 @@ class GrafikController extends Controller
                 break;
 
             case '1Y':
-                for ($m = 11; $m >= 0; $m--) {
+                for ($m = 12; $m >= 0; $m--) {
                     $from = $now->copy()->subMonths($m)->startOfMonth();
                     $to   = $from->copy()->endOfMonth();
                     $buckets[] = [
@@ -273,7 +289,7 @@ class GrafikController extends Controller
                 break;
 
             case '5Y':
-                for ($y = 4; $y >= 0; $y--) {
+                for ($y = 5; $y >= 0; $y--) {
                     $from = $now->copy()->subYears($y)->startOfYear();
                     $to   = $from->copy()->endOfYear();
                     $buckets[] = [
@@ -334,31 +350,39 @@ class GrafikController extends Controller
     // =========================================================================
 
     /**
-     * Pendapatan barang dikelompokkan berdasarkan kolom `bahan`.
-     * Format: [ ['kategori' => 'Besi', 'revenue' => ..., 'percent' => 45], ... ]
+     * Pendapatan dikelompokkan berdasarkan sumber: Terjual, Pesanan, Servis.
+     * Format: [ ['kategori' => 'Terjual', 'revenue' => ..., 'percent' => 45], ... ]
      */
     private function getRevenueByCategory(): array
     {
-        // Ambil semua log jual dari AktivitasBarang, join ke Barang untuk kolom bahan
-        $rows = AktivitasBarang::where('aktivitas_barang.jenis', 'jual')
-            ->join('barang', 'aktivitas_barang.id_barang', '=', 'barang.id_barang')
-            ->select('barang.bahan', DB::raw('SUM(aktivitas_barang.pendapatan) as total'))
-            ->groupBy('barang.bahan')
-            ->orderByDesc('total')
-            ->limit(6)
-            ->get();
+        // Pendapatan dari penjualan barang (jenis = jual)
+        $terjual = (int) AktivitasBarang::where('jenis', 'jual')->sum('pendapatan');
 
-        $totalAll = $rows->sum('total');
+        // Pendapatan dari pesanan selesai (tanggalterkirim not null)
+        $pesanan = (int) Pesanan::whereNotNull('tanggalterkirim')->sum('pendapatan');
 
-        return $rows->map(function ($row) use ($totalAll) {
-            return [
-                'kategori' => $row->bahan,
-                'revenue'  => (int) $row->total,
-                'percent'  => $totalAll > 0
-                    ? round(($row->total / $totalAll) * 100)
-                    : 0,
-            ];
-        })->toArray();
+        // Pendapatan dari servis selesai (tanggalterkirim != sentinel)
+        $servis = (int) Servis::where('tanggalterkirim', '!=', '1970-01-01 00:00:00')
+            ->whereNotNull('tanggalterkirim')
+            ->sum('pendapatan');
+
+        $totalAll = $terjual + $pesanan + $servis;
+
+        $sources = [
+            ['kategori' => 'Terjual', 'revenue' => $terjual],
+            ['kategori' => 'Pesanan', 'revenue' => $pesanan],
+            ['kategori' => 'Servis',  'revenue' => $servis],
+        ];
+
+        // Hitung persentase dan urutkan dari terbesar
+        $result = collect($sources)->map(function ($item) use ($totalAll) {
+            $item['percent'] = $totalAll > 0
+                ? round(($item['revenue'] / $totalAll) * 100, 2)
+                : 0;
+            return $item;
+        })->sortByDesc('revenue')->values()->toArray();
+
+        return $result;
     }
 
     // =========================================================================
@@ -441,10 +465,26 @@ class GrafikController extends Controller
         }
         unset($bucket);
 
+        // ── Trend: selisih persentase bucket pertama vs terakhir ──────────
+        $trendPercent = null;
+        if ($period !== '1D' && count($buckets) >= 2) {
+            $firstCount = $buckets[0]['count'];
+            $lastCount  = $buckets[count($buckets) - 1]['count'];
+            if ($firstCount > 0) {
+                $trendPercent = round((($lastCount - $firstCount) / $firstCount) * 100, 2);
+                $trendPercent = max(-200000, min(200000, $trendPercent));
+            } elseif ($lastCount > 0) {
+                $trendPercent = 100.0;
+            } else {
+                $trendPercent = 0;
+            }
+        }
+
         return [
-            'buckets'    => $buckets,
-            'maxCount'   => $max,
-            'yAxisLabels'=> $this->buildCountYAxis($max),
+            'buckets'      => $buckets,
+            'maxCount'     => $max,
+            'yAxisLabels'  => $this->buildCountYAxis($max),
+            'trendPercent' => $trendPercent,
         ];
     }
 
@@ -501,10 +541,26 @@ class GrafikController extends Controller
         }
         unset($bucket);
 
+        // ── Trend: selisih persentase bucket pertama vs terakhir ──────────
+        $trendPercent = null;
+        if ($period !== '1D' && count($buckets) >= 2) {
+            $firstCount = $buckets[0]['count'];
+            $lastCount  = $buckets[count($buckets) - 1]['count'];
+            if ($firstCount > 0) {
+                $trendPercent = round((($lastCount - $firstCount) / $firstCount) * 100, 2);
+                $trendPercent = max(-200000, min(200000, $trendPercent));
+            } elseif ($lastCount > 0) {
+                $trendPercent = 100.0;
+            } else {
+                $trendPercent = 0;
+            }
+        }
+
         return [
-            'buckets'    => $buckets,
-            'maxCount'   => $max,
-            'yAxisLabels'=> $this->buildCountYAxis($max),
+            'buckets'      => $buckets,
+            'maxCount'     => $max,
+            'yAxisLabels'  => $this->buildCountYAxis($max),
+            'trendPercent' => $trendPercent,
         ];
     }
 
