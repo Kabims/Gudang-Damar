@@ -21,9 +21,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _pass    = TextEditingController();
   final _confirm = TextEditingController();
 
-  bool _hidePass    = true;
-  bool _hideConfirm = true;
-  bool _loading     = false;
+  bool _hidePass      = true;
+  bool _hideConfirm   = true;
+  bool _loading       = false;
+  bool _loadingGoogle = false;
   String? _serverError;
   Map<String, List<String>>? _fieldErrors;
 
@@ -36,10 +37,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
+  // ─── Register email/password ──────────────────────────────────────────────
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() {
-      _loading = true;
+      _loading     = true;
       _serverError = null;
       _fieldErrors = null;
     });
@@ -65,6 +67,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
       setState(() => _serverError = 'Terjadi kesalahan: $e');
     } finally {
       if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  // ─── Google Sign-In ───────────────────────────────────────────────────────
+  Future<void> _signInWithGoogle() async {
+    setState(() {
+      _loadingGoogle = true;
+      _serverError   = null;
+    });
+
+    try {
+      await AuthService.instance.loginWithGoogle();
+
+      if (!mounted) return;
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+      );
+    } on ApiException catch (e) {
+      setState(() => _serverError = e.message);
+    } catch (e) {
+      setState(() => _serverError = 'Google Sign-In gagal: $e');
+    } finally {
+      if (mounted) setState(() => _loadingGoogle = false);
     }
   }
 
@@ -193,10 +218,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
               ),
             ),
-
             const SizedBox(height: 20),
 
-            // Divider — sama persis dengan web
+            // Divider
             Row(
               children: [
                 const Expanded(child: Divider(color: Colors.white60)),
@@ -217,17 +241,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             const SizedBox(height: 12),
 
-            // Tombol Google — background putih, teks hitam (tidak ikut putih)
+            // Tombol Google
             SizedBox(
               height: 44,
               child: OutlinedButton.icon(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Google Sign-In segera hadir'),
-                    ),
-                  );
-                },
+                onPressed: _loadingGoogle ? null : _signInWithGoogle,
                 style: OutlinedButton.styleFrom(
                   backgroundColor: Colors.white,
                   side: const BorderSide(color: AppColors.inputBorder),
@@ -235,29 +253,39 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                icon: const Icon(Icons.g_mobiledata, size: 28, color: Colors.red),
+                icon: _loadingGoogle
+                    ? const SizedBox(
+                        height: 18,
+                        width: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.red,
+                        ),
+                      )
+                    : const Icon(
+                        Icons.g_mobiledata,
+                        size: 28,
+                        color: Colors.red,
+                      ),
                 label: const Text(
                   'Sign in with Google',
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary, // tetap hitam
+                    color: AppColors.textPrimary,
                   ),
                 ),
               ),
             ),
             const SizedBox(height: 16),
 
-            // Link login — sama persis dengan web
+            // Link login
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text(
                   'Udah punya akun ya? ',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.white,
-                  ),
+                  style: TextStyle(fontSize: 12, color: Colors.white),
                 ),
                 GestureDetector(
                   onTap: () {

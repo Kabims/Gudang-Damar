@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
 import '../services/api_exception.dart';
@@ -19,8 +20,9 @@ class _LoginScreenState extends State<LoginScreen> {
   final _email   = TextEditingController();
   final _pass    = TextEditingController();
 
-  bool _hidePass = true;
-  bool _loading  = false;
+  bool _hidePass      = true;
+  bool _loading       = false;
+  bool _loadingGoogle = false;
   String? _serverError;
   Map<String, List<String>>? _fieldErrors;
 
@@ -31,10 +33,11 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  // ─── Login email/password ─────────────────────────────────────────────────
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() {
-      _loading = true;
+      _loading     = true;
       _serverError = null;
       _fieldErrors = null;
     });
@@ -58,6 +61,36 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() => _serverError = 'Terjadi kesalahan: $e');
     } finally {
       if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  // ─── Google Sign-In ───────────────────────────────────────────────────────
+  Future<void> _signInWithGoogle() async {
+    if (kIsWeb) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Google Sign-In hanya tersedia di mobile')),
+      );
+      return;
+    }
+
+    setState(() {
+      _loadingGoogle = true;
+      _serverError   = null;
+    });
+
+    try {
+      await AuthService.instance.loginWithGoogle();
+
+      if (!mounted) return;
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+      );
+    } on ApiException catch (e) {
+      setState(() => _serverError = e.message);
+    } catch (e) {
+      setState(() => _serverError = 'Google Sign-In gagal: $e');
+    } finally {
+      if (mounted) setState(() => _loadingGoogle = false);
     }
   }
 
@@ -162,16 +195,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
               ),
             ),
-
             const SizedBox(height: 20),
 
+            // Divider
             Row(
               children: [
                 const Expanded(child: Divider(color: Colors.white60)),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: Text(
-                    'ATAU DENGAN CARA LAIN',
+                    'atau dengan cara lain',
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w600,
@@ -185,16 +218,11 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 12),
 
+            // Tombol Google
             SizedBox(
               height: 44,
               child: OutlinedButton.icon(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Google Sign-In segera hadir'),
-                    ),
-                  );
-                },
+                onPressed: _loadingGoogle ? null : _signInWithGoogle,
                 style: OutlinedButton.styleFrom(
                   backgroundColor: Colors.white,
                   side: const BorderSide(color: AppColors.inputBorder),
@@ -202,7 +230,20 @@ class _LoginScreenState extends State<LoginScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                icon: const Icon(Icons.g_mobiledata, size: 28, color: Colors.red),
+                icon: _loadingGoogle
+                    ? const SizedBox(
+                        height: 18,
+                        width: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.red,
+                        ),
+                      )
+                    : const Icon(
+                        Icons.g_mobiledata,
+                        size: 28,
+                        color: Colors.red,
+                      ),
                 label: const Text(
                   'Sign in with Google',
                   style: TextStyle(

@@ -11,7 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 /**
  * Endpoint Mobile API untuk autentikasi (Flutter app).
  *
@@ -115,6 +116,57 @@ class AuthMobileApiController extends Controller
     {
         return response()->json([
             'user' => $request->user(),
+        ]);
+    }
+        /**
+     * POST /mobile-api/auth/google
+     *
+     * Body  : { id_token, device_name? }
+     * 200   : { message, user, token }
+     * 401   : { message: 'Token Google tidak valid' }
+     */
+    public function googleLogin(Request $request): JsonResponse
+    {
+        $request->validate([
+            'id_token'    => ['required', 'string'],
+            'device_name' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        // Verifikasi idToken ke Google
+        $clientId = config('services.google_android.client_id');
+        $response = Http::get('https://oauth2.googleapis.com/tokeninfo', [
+            'id_token' => $request->id_token,
+        ]);
+
+        if ($response->failed() || $response->json('aud') !== $clientId) {
+            return response()->json(['message' => 'Token Google tidak valid'], 401);
+        }
+
+        $payload = $response->json();
+
+        // Cari atau buat user
+        $user = User::firstOrCreate(
+            ['email' => $payload['email']],
+            [
+                'name'              => $payload['name'] ?? $payload['email'],
+                'google_id'         => $payload['sub'],
+                'email_verified_at' => now(),
+                'password'          => Hash::make(str()->random(32)),
+            ]
+        );
+
+        // Update google_id kalau user sudah ada tapi belum punya
+        if (! $user->google_id) {
+            $user->update(['google_id' => $payload['sub']]);
+        }
+
+        $deviceName = $request->device_name ?? 'mobile-google';
+        $token      = $user->createToken($deviceName)->plainTextToken;
+
+        return response()->json([
+            'message' => 'Login Google berhasil',
+            'user'    => $user,
+            'token'   => $token,
         ]);
     }
 }

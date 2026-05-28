@@ -17,8 +17,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Public — nggak butuh login
-Route::post('/register', [AuthMobileApiController::class, 'register']);
-Route::post('/login',    [AuthMobileApiController::class, 'login']);
+Route::post('/register',     [AuthMobileApiController::class, 'register']);
+Route::post('/login',        [AuthMobileApiController::class, 'login']);
+Route::post('/auth/google',  [AuthMobileApiController::class, 'googleLogin']);
 
 // Protected — wajib kirim header: Authorization: Bearer <token>
 Route::middleware('auth:sanctum')->group(function () {

@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io' show SocketException;
 
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 
 import '../config/api_config.dart';
@@ -29,6 +31,18 @@ class AuthService {
   // Cache di memory biar nggak baca storage tiap request
   String? _cachedToken;
   Map<String, dynamic>? _cachedUser;
+
+  // ─────────────────────────────────────────────────────────
+  // Google Sign-In setup
+  // ─────────────────────────────────────────────────────────
+
+  static const _androidClientId =
+      '533734262935-pcjjjoo0pc57tmv4vifocv30dktl5usk.apps.googleusercontent.com';
+
+  late final _googleSignIn = GoogleSignIn(
+    clientId: kIsWeb ? null : _androidClientId,
+    scopes: ['email', 'profile'],
+  );
 
   // ─────────────────────────────────────────────────────────
   // Token & User storage
@@ -109,6 +123,65 @@ class AuthService {
       }
     }
     await _clearAuth();
+    await signOutGoogle();
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // Google Login
+  // ─────────────────────────────────────────────────────────
+
+  /// Sign in dengan Google → kirim idToken ke Laravel → dapat Sanctum token.
+  /// Di web (preview Edge) diblokir karena butuh Web Client ID terpisah.
+  Future<Map<String, dynamic>> loginWithGoogle({
+    String deviceName = 'mobile-google',
+  }) async {
+    if (kIsWeb) {
+      throw ApiException(
+        message: 'Google Sign-In hanya tersedia di mobile',
+      );
+    }
+
+    try {
+      // 1. Minta user pilih akun Google (native popup)
+      final googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) {
+        throw ApiException(message: 'Login Google dibatalkan');
+      }
+
+      // 2. Ambil idToken
+      final auth    = await googleUser.authentication;
+      final idToken = auth.idToken;
+      if (idToken == null) {
+        throw ApiException(message: 'Gagal mendapat token dari Google');
+      }
+
+      // 3. Kirim idToken ke Laravel
+      final body = await _post(
+        '${ApiConfig.apiUrl}/auth/google',
+        {
+          'id_token'    : idToken,
+          'device_name' : deviceName,
+        },
+      );
+
+      // 4. Simpan token & user
+      await _saveAuth(body['token'] as String, body['user'] as Map<String, dynamic>);
+      return body;
+    } on ApiException {
+      rethrow;
+    } on SocketException {
+      throw ApiException(message: 'Tidak bisa terhubung ke server');
+    } catch (e) {
+      throw ApiException(message: 'Error: $e');
+    }
+  }
+
+  /// Sign out dari Google juga saat logout.
+  Future<void> signOutGoogle() async {
+    if (kIsWeb) return;
+    try {
+      await _googleSignIn.signOut();
+    } catch (_) {}
   }
 
   // ─────────────────────────────────────────────────────────
@@ -143,7 +216,6 @@ class AuthService {
     } on FormatException {
       throw ApiException(message: 'Response server tidak valid.');
     } catch (e) {
-      // Tangkap error generik (kayak XMLHttpRequestError di web)
       throw ApiException(message: 'Error: $e');
     }
   }
