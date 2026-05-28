@@ -28,7 +28,7 @@ class Pesanan extends Model
         'ukuran',
         'ketebalan',
         'harga',
-        'pendapatan',  // ✅ FIX: tambahkan agar bisa diupdate saat tandai selesai
+        'pendapatan',  
     ];
 
     protected $casts = [
@@ -41,7 +41,7 @@ class Pesanan extends Model
         'ukuran'           => 'float',
         'ketebalan'        => 'float',
         'harga'            => 'integer',
-        'pendapatan'       => 'integer',  // ✅ FIX: cast ke integer
+        'pendapatan'       => 'integer',  
     ];
 
     protected static function booted()

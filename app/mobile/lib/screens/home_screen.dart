@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 import 'login_screen.dart';
+import 'riwayat_aktivitas_screen.dart'; 
 
-/// Home screen placeholder setelah user berhasil register/login.
-/// Nantinya bakal di-replace dengan dashboard fitur (barang, pesanan, dll).
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -52,14 +51,14 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
 
-    if (confirmed != true) return;
-
-    await AuthService.instance.logout();
-    if (!mounted) return;
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const LoginScreen()),
-      (route) => false,
-    );
+    if (confirmed == true) {
+      await AuthService.instance.logout();
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+      );
+    }
   }
 
   @override
@@ -67,94 +66,74 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Gudang Damar'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            tooltip: 'Logout',
             onPressed: _handleLogout,
+            tooltip: 'Logout',
           ),
         ],
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
-          : Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 600),
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
+          : SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Center(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Card(
-                        elevation: 2,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            children: [
-                              CircleAvatar(
-                                radius: 24,
-                                backgroundColor: AppColors.primary,
-                                child: Text(
-                                  (_user?['name'] as String? ?? '?')
-                                      .substring(0, 1)
-                                      .toUpperCase(),
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      _user?['name'] as String? ?? 'Pengguna',
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      _user?['email'] as String? ?? '',
-                                      style: const TextStyle(
-                                        fontSize: 13,
-                                        color: AppColors.textSecondary,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      const Text(
-                        'Selamat datang! 🎉',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
+                      Text(
+                        'Selamat Datang, ${_user?['name'] ?? 'User'}!',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const Text(
-                        'Halaman ini masih placeholder. Nanti diisi dengan '
-                        'daftar barang, pesanan, riwayat servis, dan menu lain.',
-                        style: TextStyle(
-                          fontSize: 13,
+                      Text(
+                        'Email: ${_user?['email'] ?? '-'}',
+                        style: const TextStyle(
+                          fontSize: 14,
                           color: AppColors.textSecondary,
-                          height: 1.5,
                         ),
                       ),
+                      
+                      // 2. TAMBAHKAN TOMBOL NAVIGASI MENU RIWAYAT DI SINI
+                      const SizedBox(height: 24),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            // Pindah ke halaman Riwayat Aktivitas
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const RiwayatAktivitasScreen(),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.history, color: Colors.white),
+                          label: const Text(
+                            'Lihat Riwayat Aktivitas',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary, // Menggunakan warna tema project-mu
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                      ),
+
                       const SizedBox(height: 24),
                       Container(
                         padding: const EdgeInsets.all(12),
