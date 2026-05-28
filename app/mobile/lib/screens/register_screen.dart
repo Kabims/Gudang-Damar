@@ -76,50 +76,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
-              'Buat Akun Baru',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 4),
-            const Text(
-              'Lengkapi data diri untuk mulai',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 12,
-                color: AppColors.textSecondary,
-              ),
-            ),
-            const SizedBox(height: 20),
-
             if (_serverError != null) ...[
               ErrorBanner(message: _serverError!),
               const SizedBox(height: 12),
             ],
 
+            // Nama
             LabeledField(
-              label: 'Nama Lengkap',
+              label: 'Nama',
               errorText: _fieldErrors?['name']?.first,
               child: TextFormField(
                 controller: _name,
-                decoration: authInputDecoration('Nama Anda'),
+                decoration: authInputDecoration('Full name'),
                 validator: (v) =>
                     (v == null || v.trim().isEmpty) ? 'Nama wajib diisi' : null,
               ),
             ),
             const SizedBox(height: 12),
 
+            // Email
             LabeledField(
               label: 'Alamat Email',
               errorText: _fieldErrors?['email']?.first,
               child: TextFormField(
                 controller: _email,
                 keyboardType: TextInputType.emailAddress,
-                decoration: authInputDecoration('nama@email.com'),
+                decoration: authInputDecoration('email@contoh.com'),
                 validator: (v) {
                   if (v == null || v.trim().isEmpty) return 'Email wajib diisi';
                   if (!v.contains('@')) return 'Format email tidak valid';
@@ -129,17 +111,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             const SizedBox(height: 12),
 
+            // Sandi
             LabeledField(
               label: 'Sandi',
               errorText: _fieldErrors?['password']?.first,
               child: TextFormField(
                 controller: _pass,
                 obscureText: _hidePass,
-                decoration: authInputDecoration('••••••••').copyWith(
+                decoration: authInputDecoration('Sandi').copyWith(
                   suffixIcon: IconButton(
                     icon: Icon(
                       _hidePass ? Icons.visibility_off : Icons.visibility,
                       size: 18,
+                      color: Colors.white70,
                     ),
                     onPressed: () => setState(() => _hidePass = !_hidePass),
                   ),
@@ -153,18 +137,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             const SizedBox(height: 12),
 
+            // Konfirmasi Sandi
             LabeledField(
               label: 'Konfirmasi Sandi',
               child: TextFormField(
                 controller: _confirm,
                 obscureText: _hideConfirm,
-                decoration: authInputDecoration('••••••••').copyWith(
+                decoration: authInputDecoration('Konfirmasi sandi').copyWith(
                   suffixIcon: IconButton(
                     icon: Icon(
                       _hideConfirm ? Icons.visibility_off : Icons.visibility,
                       size: 18,
+                      color: Colors.white70,
                     ),
-                    onPressed: () => setState(() => _hideConfirm = !_hideConfirm),
+                    onPressed: () =>
+                        setState(() => _hideConfirm = !_hideConfirm),
                   ),
                 ),
                 validator: (v) {
@@ -209,18 +196,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
             const SizedBox(height: 20),
 
-            // Divider
+            // Divider — sama persis dengan web
             Row(
               children: [
                 const Expanded(child: Divider(color: Colors.white60)),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: Text(
-                    'ATAU DENGAN CARA LAIN',
+                    'atau dengan cara lain',
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textSecondary.withOpacity(0.8),
+                      color: Colors.white.withOpacity(0.8),
                       letterSpacing: 0.5,
                     ),
                   ),
@@ -230,7 +217,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             const SizedBox(height: 12),
 
-            // Google button (disabled)
+            // Tombol Google — background putih, teks hitam (tidak ikut putih)
             SizedBox(
               height: 44,
               child: OutlinedButton.icon(
@@ -254,14 +241,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: AppColors.textPrimary, // tetap hitam
                   ),
                 ),
               ),
             ),
             const SizedBox(height: 16),
 
-            // Link login
+            // Link login — sama persis dengan web
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -269,7 +256,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   'Udah punya akun ya? ',
                   style: TextStyle(
                     fontSize: 12,
-                    color: AppColors.textSecondary,
+                    color: Colors.white,
                   ),
                 ),
                 GestureDetector(
@@ -285,7 +272,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.primaryDark,
+                      color: Colors.white,
+                      decoration: TextDecoration.underline,
+                      decorationColor: Colors.white,
                     ),
                   ),
                 ),

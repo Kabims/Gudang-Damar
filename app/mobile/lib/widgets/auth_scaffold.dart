@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
 /// Scaffold standar untuk semua auth screen (register & login).
-/// Berisi background gradient + logo + glass card yang membungkus form.
+/// Berisi background image + logo + glass card yang membungkus form.
 class AuthScaffold extends StatelessWidget {
   final Widget cardChild;
   const AuthScaffold({super.key, required this.cardChild});
@@ -11,74 +11,79 @@ class AuthScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFFB8D9F0),
-              Color(0xFF66ACE6),
-              Color(0xFF3B82C4),
-            ],
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Background image
+          Image.asset(
+            'assets/images/BackGroundDevo.png',
+            fit: BoxFit.cover,
           ),
-        ),
-        child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-              child: ConstrainedBox(
-                // Batasi lebar di web (browser fullscreen) biar nggak melar
-                constraints: const BoxConstraints(maxWidth: 420),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Logo placeholder — bisa diganti Image.asset nanti
-                    Container(
-                      width: 70,
-                      height: 70,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black26,
-                            blurRadius: 12,
-                            offset: Offset(0, 4),
+
+          // Overlay gelap biar teks & card tetap terbaca
+          Container(
+            color: Colors.black.withOpacity(0.45),
+          ),
+
+          // Konten
+          SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 420),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Logo dari asset
+                      Container(
+                        width: 70,
+                        height: 70,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 12,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.asset(
+                            'assets/images/LogoDamar.jpeg',
+                            fit: BoxFit.cover,
                           ),
-                        ],
+                        ),
                       ),
-                      child: const Icon(
-                        Icons.warehouse_rounded,
-                        size: 38,
-                        color: AppColors.primary,
+                      const SizedBox(height: 12),
+                      const Text(
+                        'Gudang Damar',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    const Text(
-                      'Gudang Damar',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                      const SizedBox(height: 24),
+                      GlassCard(child: cardChild),
+                      const SizedBox(height: 16),
+                      Text(
+                        '© 2026 Gudang Damar',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.white.withOpacity(0.85),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 24),
-                    GlassCard(child: cardChild),
-                    const SizedBox(height: 16),
-                    Text(
-                      '© 2026 Gudang Damar',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.white.withOpacity(0.85),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -110,7 +115,7 @@ class GlassCard extends StatelessWidget {
   }
 }
 
-/// Input field dengan label di atas + slot error text di bawah.
+/// Input field dengan label putih di atas + slot error text di bawah.
 class LabeledField extends StatelessWidget {
   final String label;
   final Widget child;
@@ -133,7 +138,7 @@ class LabeledField extends StatelessWidget {
           style: const TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+            color: Colors.white, // putih
           ),
         ),
         const SizedBox(height: 4),
@@ -143,7 +148,10 @@ class LabeledField extends StatelessWidget {
             padding: const EdgeInsets.only(top: 4),
             child: Text(
               errorText!,
-              style: const TextStyle(fontSize: 11, color: AppColors.errorRed),
+              style: const TextStyle(
+                fontSize: 11,
+                color: Color(0xFFFFCDD2), // merah muda — tetap terbaca di atas background gelap
+              ),
             ),
           ),
       ],
