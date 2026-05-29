@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io' show SocketException;
 
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/services.dart' show PlatformException;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 
@@ -36,11 +37,16 @@ class AuthService {
   // Google Sign-In setup
   // ─────────────────────────────────────────────────────────
 
-  static const _androidClientId =
-      '533734262935-pcjjjoo0pc57tmv4vifocv30dktl5usk.apps.googleusercontent.com';
+  /// Web Client ID dari Google Cloud Console → dipakai sebagai serverClientId
+  /// agar library bisa meminta idToken yang bisa diverifikasi oleh server Laravel.
+  /// PENTING: Ini bukan Android Client ID, melainkan Web Client ID.
+  static const _webClientId =
+      '1085258754908-fr0no50qlbk5dnujrs4isfn41s05bp6b.apps.googleusercontent.com';
 
   late final _googleSignIn = GoogleSignIn(
-    clientId: kIsWeb ? null : _androidClientId,
+    // serverClientId diperlukan agar auth.idToken tidak null saat dikirim ke backend.
+    // Di Android, clientId tidak dipakai — identitas app ditentukan dari SHA-1 keystore.
+    serverClientId: _webClientId,
     scopes: ['email', 'profile'],
   );
 
@@ -152,7 +158,11 @@ class AuthService {
       final auth    = await googleUser.authentication;
       final idToken = auth.idToken;
       if (idToken == null) {
-        throw ApiException(message: 'Gagal mendapat token dari Google');
+        throw ApiException(
+          message: 'Gagal mendapat idToken dari Google. '
+              'Pastikan SHA-1 debug keystore sudah didaftarkan di Google Cloud Console '
+              'dan serverClientId adalah Web Client ID yang benar.',
+        );
       }
 
       // 3. Kirim idToken ke Laravel
@@ -171,8 +181,19 @@ class AuthService {
       rethrow;
     } on SocketException {
       throw ApiException(message: 'Tidak bisa terhubung ke server');
+    } on PlatformException catch (e) {
+      throw ApiException(message: 'Google Sign-In Platform Error: ${e.message}');
     } catch (e) {
-      throw ApiException(message: 'Error: $e');
+      // Tangkap PlatformException dari plugin Google Sign-In (misal: sign_in_failed)
+      final msg = e.toString();
+      if (msg.contains('sign_in_failed') || msg.contains('ApiException')) {
+        throw ApiException(
+          message: 'Google Sign-In gagal. '
+              'Pastikan SHA-1 debug keystore (7F:2B:47:1B:59:CF:FD:C0:34:1F:D3:FD:02:6D:38:15:D9:9D:01:40) '
+              'sudah didaftarkan di Google Cloud Console untuk package com.gudangdamar.app.',
+        );
+      }
+      throw ApiException(message: 'Google Sign-In error: $e');
     }
   }
 

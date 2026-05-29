@@ -1,1 +1,29 @@
-{"installed":{"client_id":"533734262935-pcjjjoo0pc57tmv4vifocv30dktl5usk.apps.googleusercontent.com","project_id":"gudang-damar-497702","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs"}}
+{
+    "project_info": {
+        "project_number": "551713432369",
+        "project_id": "gudang-damar-497702-5e446",
+        "storage_bucket": "gudang-damar-497702-5e446.firebasestorage.app"
+    },
+    "client": [
+        {
+            "client_info": {
+                "mobilesdk_app_id": "1:551713432369:android:b4c77929f2ee0dfe664610",
+                "android_client_info": {
+                    "package_name": "com.gudangdamar.app"
+                }
+            },
+            "oauth_client": [],
+            "api_key": [
+                {
+                    "current_key": "AIzaSyColsaWjinf8W9PIxyCiExT9DJrad4Yns0"
+                }
+            ],
+            "services": {
+                "appinvite_service": {
+                    "other_platform_oauth_client": []
+                }
+            }
+        }
+    ],
+    "configuration_version": "1"
+}

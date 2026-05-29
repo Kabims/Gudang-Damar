@@ -5,7 +5,8 @@ import 'screens/register_screen.dart';
 import 'services/auth_service.dart';
 import 'theme/app_theme.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const GudangDamarApp());
 }
 
