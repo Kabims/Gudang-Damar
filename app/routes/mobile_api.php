@@ -1,7 +1,8 @@
 <?php
 
 use App\Http\Controllers\MobileApi\AuthMobileApiController;
-use App\Http\Controllers\MobileApi\AktivitasMobileApiController; // 1. UBAH IMPORT KE CONTROLLER BARU
+use App\Http\Controllers\MobileApi\AktivitasMobileApiController;
+use App\Http\Controllers\MobileApi\BarangMobileApiController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,6 +21,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me',      [AuthMobileApiController::class, 'me']);
     Route::post('/logout', [AuthMobileApiController::class, 'logout']);
     
-    // 2. DI SINI KITA ARAHKAN KE CONTROLLER MOBILE BARU
+    // Fitur Barang
+    Route::get('/barang',            [BarangMobileApiController::class, 'index']);
+    Route::post('/barang',           [BarangMobileApiController::class, 'store']);
+    Route::get('/barang/{id}',       [BarangMobileApiController::class, 'show']);
+    Route::put('/barang/{id}',       [BarangMobileApiController::class, 'update']);
+    Route::delete('/barang/{id}',    [BarangMobileApiController::class, 'destroy']);
+
+    // Fitur Riwayat Aktivitas
     Route::get('/riwayat', [AktivitasMobileApiController::class, 'index']);
+    Route::get('/riwayat/export', [AktivitasMobileApiController::class, 'export']);
 });

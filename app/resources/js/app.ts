@@ -29,8 +29,6 @@ createInertiaApp({
             return null;
         case name.startsWith('pesanan/'):
             return null;
-        case name.startsWith('grafik/'):
-            return null;
         case name.startsWith('auth/'):
             return AuthLayout;
         case name.startsWith('settings/'):

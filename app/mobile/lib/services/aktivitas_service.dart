@@ -29,7 +29,7 @@ class AktivitasService {
     if (status != null && status != 'all') queryParams['status'] = status;
 
     // Buat URI dengan query parameters
-    final uri = Uri.parse('${ApiConfig.apiUrl}/riwayat') // Pastikan endpoint ini terdaftar di routes/api.php Laravel
+    final uri = Uri.parse('${ApiConfig.apiUrl}/riwayat')
         .replace(queryParameters: queryParams);
 
     try {
@@ -38,7 +38,7 @@ class AktivitasService {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Authorization': 'Bearer $token', // Sanctum bearer token authentication
+          'Authorization': 'Bearer $token', 
         },
       ).timeout(ApiConfig.timeout);
 
@@ -50,6 +50,43 @@ class AktivitasService {
       }
     } catch (e) {
       print('Error koneksi ApiService: $e');
+      return null;
+    }
+  }
+
+  /// Mengekspor riwayat aktivitas menjadi string CSV
+  Future<String?> exportRiwayatAktivitas({
+    String? search,
+    String? jenis,
+    String? status,
+  }) async {
+    final token = await AuthService.instance.getToken();
+    if (token == null) return null;
+
+    final Map<String, String> queryParams = {};
+    if (search != null && search.isNotEmpty) queryParams['search'] = search;
+    if (jenis != null && jenis != 'all') queryParams['jenis'] = jenis.toLowerCase();
+    if (status != null && status != 'all') queryParams['status'] = status;
+
+    final uri = Uri.parse('${ApiConfig.apiUrl}/riwayat/export')
+        .replace(queryParameters: queryParams);
+
+    try {
+      final response = await http.get(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      ).timeout(ApiConfig.timeout);
+
+      if (response.statusCode == 200) {
+        return response.body; 
+      } else {
+        print('Gagal export data: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error koneksi export: $e');
       return null;
     }
   }

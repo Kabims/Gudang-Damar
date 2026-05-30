@@ -1,7 +1,10 @@
 // lib/screens/riwayat_aktivitas_screen.dart
 
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:file_saver/file_saver.dart';
 import '../services/aktivitas_service.dart';
+import 'barang/barang_list_screen.dart';
 
 class RiwayatAktivitasScreen extends StatefulWidget {
   const RiwayatAktivitasScreen({super.key});
@@ -15,6 +18,7 @@ class _RiwayatAktivitasScreenState extends State<RiwayatAktivitasScreen> {
   List<dynamic> _transactions = [];
   Map<String, dynamic> _stats = {};
   bool _isLoading = true;
+  bool _isExporting = false; // State untuk tombol export
 
   // State variables untuk filter & pagination
   String _searchQuery = '';
@@ -55,27 +59,79 @@ class _RiwayatAktivitasScreenState extends State<RiwayatAktivitasScreen> {
     }
   }
 
+  /// Fungsi untuk menghandle Export Data menggunakan File Saver (Cross-platform)
+  Future<void> _handleExport() async {
+    setState(() => _isExporting = true);
+    
+    try {
+      final csvData = await AktivitasService.instance.exportRiwayatAktivitas(
+        search: _searchQuery,
+        jenis: _selectedJenis,
+        status: _selectedStatus,
+      );
+
+      if (csvData != null && mounted) {
+        final bytes = Uint8List.fromList(csvData.codeUnits);
+        final fileName = 'GudangDamar_Export_${DateTime.now().millisecondsSinceEpoch}';
+
+        // --- BAGIAN YANG DIPERBAIKI ---
+        final savedPath = await FileSaver.instance.saveFile(
+          name: '$fileName.csv', // Ekstensi ditambahkan langsung di sini
+          bytes: bytes,
+          mimeType: MimeType.csv,
+        );
+        // ------------------------------
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Berhasil diexport! File tersimpan.'),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Gagal melakukan export data dari server.'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Terjadi kesalahan: $e'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isExporting = false);
+    }
+  }
+
   // --- Helper Warna & Ikon Sesuai Jenis ---
   Color _getJenisColor(String jenis) {
     switch (jenis.toLowerCase()) {
-      case 'pesanan': return const Color(0xFF0284C7); // Biru khas mockup
-      case 'barang': return const Color(0xFFD97706);  // Amber/Oranye mockup
-      case 'servis': return const Color(0xFF7C3AED);  // Ungu mockup
+      case 'pesanan': return const Color(0xFF0284C7); 
+      case 'barang': return const Color(0xFFD97706);  
+      case 'servis': return const Color(0xFF7C3AED);  
       default: return Colors.grey;
     }
   }
 
   Color _getStatusColor(String status) {
     final s = status.toLowerCase();
-    if (s == 'selesai') return const Color(0xFF16A34A); // Hijau pekat text
-    if (s == 'stok masuk' || s == 'dibeli') return const Color(0xFF475569); // Abu-abu status barang
+    if (s == 'selesai') return const Color(0xFF16A34A); 
+    if (s == 'stok masuk' || s == 'dibeli') return const Color(0xFF475569); 
     return const Color(0xFFD97706);
   }
 
   Color _getStatusBgColor(String status) {
     final s = status.toLowerCase();
-    if (s == 'selesai') return const Color(0xFFDCFCE7); // Soft green bg
-    if (s == 'stok masuk' || s == 'dibeli') return const Color(0xFFE2E8F0); // Soft grey bg
+    if (s == 'selesai') return const Color(0xFFDCFCE7); 
+    if (s == 'stok masuk' || s == 'dibeli') return const Color(0xFFE2E8F0); 
     return const Color(0xFFFEF3C7);
   }
 
@@ -165,11 +221,21 @@ class _RiwayatAktivitasScreenState extends State<RiwayatAktivitasScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: ElevatedButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(Icons.vertical_align_bottom, size: 16, color: Colors.white),
-                  label: const Text('Export Data', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                  onPressed: _isExporting ? null : _handleExport,
+                  icon: _isExporting 
+                      ? const SizedBox(
+                          width: 16, 
+                          height: 16, 
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+                        )
+                      : const Icon(Icons.vertical_align_bottom, size: 16, color: Colors.white),
+                  label: Text(
+                    _isExporting ? 'Mengekspor...' : 'Export Data', 
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF006C35),
+                    disabledBackgroundColor: Colors.grey,
                     elevation: 0,
                     minimumSize: const Size(double.infinity, 45),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
@@ -219,7 +285,7 @@ class _RiwayatAktivitasScreenState extends State<RiwayatAktivitasScreen> {
                 ],
               ),
 
-              // --- Search Bar & Filter Dropdown (Responsif Terhadap Lebar Layar) ---
+              // --- Search Bar & Filter Dropdown ---
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Column(
@@ -320,20 +386,19 @@ class _RiwayatAktivitasScreenState extends State<RiwayatAktivitasScreen> {
               ),
               const SizedBox(height: 24),
 
-              // --- Footer Copyright Sesuai Figma ---
+              // --- Footer Copyright ---
               const Center(
                 child: Text(
                   '© 2025 GudangDamar. All rights reserved.',
                   style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12, fontWeight: FontWeight.w500),
                 ),
               ),
-              const SizedBox(height: 100), // Spasi aman dari Bottom Nav Bar
+              const SizedBox(height: 100), 
             ],
           ),
         ),
       ),
 
-      // --- Bottom Navigation Bar Sesuai Figma ---
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.white,
@@ -341,7 +406,15 @@ class _RiwayatAktivitasScreenState extends State<RiwayatAktivitasScreen> {
         unselectedItemColor: const Color(0xFF64748B),
         selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
         unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
-        currentIndex: 3, // Menu 'Activity' aktif
+        currentIndex: 3, 
+        onTap: (index) {
+          if (index == 0) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const BarangListScreen()),
+            );
+          }
+        },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.inventory_2_outlined), label: 'Inventory'),
           BottomNavigationBarItem(icon: Icon(Icons.build_circle_outlined), label: 'Service'),
@@ -377,7 +450,7 @@ class _RiwayatAktivitasScreenState extends State<RiwayatAktivitasScreen> {
   }
 }
 
-// --- SUB-WIDGETS LAYOUT FIGMA ---
+// --- SUB-WIDGETS LAYOUT ---
 
 class SummaryCard extends StatelessWidget {
   final IconData icon; final String title; final String value; final String subtitle;
