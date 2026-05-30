@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:file_saver/file_saver.dart';
 import '../services/aktivitas_service.dart';
+import 'barang/barang_list_screen.dart';
 
 class RiwayatAktivitasScreen extends StatefulWidget {
   const RiwayatAktivitasScreen({super.key});
@@ -398,7 +399,6 @@ class _RiwayatAktivitasScreenState extends State<RiwayatAktivitasScreen> {
         ),
       ),
 
-      // --- Bottom Navigation Bar ---
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.white,
@@ -407,6 +407,14 @@ class _RiwayatAktivitasScreenState extends State<RiwayatAktivitasScreen> {
         selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
         unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
         currentIndex: 3, 
+        onTap: (index) {
+          if (index == 0) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const BarangListScreen()),
+            );
+          }
+        },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.inventory_2_outlined), label: 'Inventory'),
           BottomNavigationBarItem(icon: Icon(Icons.build_circle_outlined), label: 'Service'),
