@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../models/barang.dart';
 import '../../services/barang_service.dart';
-import '../../widgets/shared.dart';
+import '../../widgets/inventory_shared.dart';
+import '../pesanan/pesanan_list_screen.dart';
+import '../servis/servis_list_screen.dart';
 import 'barang_tambah_sheet.dart';
+import 'barang_edit_sheet.dart';
+import 'barang_hapus_konfirmasi.dart';
 import '../riwayat_aktivitas_screen.dart';
 
 class BarangListScreen extends StatefulWidget {
@@ -48,7 +52,9 @@ class _BarangListScreenState extends State<BarangListScreen> {
 
   void _applySorting() {
     if (_currentSort == 'Nama (A-Z)') {
-      _barangList.sort((a, b) => a.nama.toLowerCase().compareTo(b.nama.toLowerCase()));
+      _barangList.sort(
+        (a, b) => a.nama.toLowerCase().compareTo(b.nama.toLowerCase()),
+      );
     } else if (_currentSort == 'Harga Tertinggi') {
       _barangList.sort((a, b) => b.harga.compareTo(a.harga));
     } else if (_currentSort == 'Harga Terendah') {
@@ -61,7 +67,12 @@ class _BarangListScreenState extends State<BarangListScreen> {
   }
 
   Future<void> _hapusBarang(Barang barang) async {
-    final confirm = await showPremiumDeleteConfirmModal(context, barang.nama);
+    final confirm = await showPremiumBarangHapusConfirmModal(
+      context,
+      barang.nama,
+      barang.bahan,
+      barang.idBarang.toString(),
+    );
     if (!confirm) return;
 
     setState(() => _isLoading = true);
@@ -82,23 +93,42 @@ class _BarangListScreenState extends State<BarangListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.primary,
         elevation: 0,
-        titleSpacing: 0,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(color: const Color(0xFFE5E7EB), height: 1),
+        automaticallyImplyLeading: false,
+        title: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: Image.asset(
+                'assets/images/LogoDamar.jpeg',
+                width: 32,
+                height: 32,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    const Icon(Icons.broken_image, color: Colors.white),
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Text(
+              'Gudang Damar',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: 18,
+              ),
+            ),
+          ],
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: Color(0xFF475569)),
-          onPressed: () {},
-        ),
-        title: const Text('Gudang Damar', style: TextStyle(color: Color(0xFF335C81), fontWeight: FontWeight.bold, fontSize: 20)),
         actions: [
           IconButton(
-            icon: const Icon(Icons.account_circle_outlined, color: Color(0xFF94A3B8), size: 28),
+            icon: const Icon(
+              Icons.account_circle_outlined,
+              color: Colors.white,
+              size: 28,
+            ),
             onPressed: () {},
           ),
           const SizedBox(width: 8),
@@ -111,9 +141,19 @@ class _BarangListScreenState extends State<BarangListScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Title Section
-              const Text('List Barang', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Color(0xFF0F172A))),
+              const Text(
+                'List Barang',
+                style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF0F172A),
+                ),
+              ),
               const SizedBox(height: 4),
-              const Text('Kelola data barang, pantau ketersediaan stok, dan perbarui informasi gudang secara efisien dalam satu tempat.', style: TextStyle(fontSize: 14, color: Color(0xFF64748B))),
+              const Text(
+                'Kelola data barang, pantau ketersediaan stok, dan perbarui informasi gudang secara efisien dalam satu tempat.',
+                style: TextStyle(fontSize: 14, color: Color(0xFF64748B)),
+              ),
               const SizedBox(height: 24),
 
               // Search Bar
@@ -127,13 +167,29 @@ class _BarangListScreenState extends State<BarangListScreen> {
                 decoration: InputDecoration(
                   hintText: 'Cari barang...',
                   hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
-                  prefixIcon: const Icon(Icons.search, color: Color(0xFF94A3B8), size: 20),
+                  prefixIcon: const Icon(
+                    Icons.search,
+                    color: Color(0xFF94A3B8),
+                    size: 20,
+                  ),
                   filled: true,
                   fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFD1D5DB))),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFD1D5DB))),
-                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFF335C81))),
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 0,
+                    horizontal: 16,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: Color(0xFF66ACE6)),
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -144,18 +200,23 @@ class _BarangListScreenState extends State<BarangListScreen> {
                 child: ElevatedButton.icon(
                   onPressed: () async {
                     final res = await showTambahBarangDialog(context);
-                    if (res != null) {
+                    if (res != null && context.mounted) {
                       showPremiumSuccessModal(context);
                       _fetchData();
                     }
                   },
                   icon: const Icon(Icons.add, color: Colors.white, size: 20),
-                  label: const Text('Tambah Barang', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                  label: const Text(
+                    'Tambah Barang',
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                  ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF335C81),
+                    backgroundColor: const Color(0xFF66ACE6),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                     elevation: 0,
                   ),
                 ),
@@ -165,7 +226,14 @@ class _BarangListScreenState extends State<BarangListScreen> {
               // Sorting
               Row(
                 children: [
-                  const Text('Urutkan:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF64748B))),
+                  const Text(
+                    'Urutkan:',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF64748B),
+                    ),
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Container(
@@ -180,14 +248,28 @@ class _BarangListScreenState extends State<BarangListScreen> {
                         child: DropdownButton<String>(
                           value: _currentSort,
                           isExpanded: true,
-                          icon: const Icon(Icons.keyboard_arrow_down, color: Color(0xFF64748B), size: 16),
-                          style: const TextStyle(fontSize: 14, color: Color(0xFF0F172A)),
-                          items: ['Nama (A-Z)', 'Harga Tertinggi', 'Harga Terendah', 'Stok Tertinggi', 'Stok Terendah'].map((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
-                            );
-                          }).toList(),
+                          icon: const Icon(
+                            Icons.keyboard_arrow_down,
+                            color: Color(0xFF64748B),
+                            size: 16,
+                          ),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF0F172A),
+                          ),
+                          items:
+                              [
+                                'Nama (A-Z)',
+                                'Harga Tertinggi',
+                                'Harga Terendah',
+                                'Stok Tertinggi',
+                                'Stok Terendah',
+                              ].map((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
                           onChanged: (val) {
                             if (val != null) {
                               setState(() {
@@ -206,18 +288,30 @@ class _BarangListScreenState extends State<BarangListScreen> {
 
               // Inventory List
               if (_isLoading)
-                const Center(child: CircularProgressIndicator(color: Color(0xFF335C81)))
+                const Center(
+                  child: CircularProgressIndicator(color: Color(0xFF66ACE6)),
+                )
               else if (_barangList.isEmpty)
-                const Center(child: Text('Tidak ada barang ditemukan.', style: TextStyle(color: Color(0xFF64748B))))
+                const Center(
+                  child: Text(
+                    'Tidak ada barang ditemukan.',
+                    style: TextStyle(color: Color(0xFF64748B)),
+                  ),
+                )
               else
                 Builder(
                   builder: (context) {
                     final startIndex = (_currentPage - 1) * _itemsPerPage;
-                    final endIndex = (startIndex + _itemsPerPage > _barangList.length)
+                    final endIndex =
+                        (startIndex + _itemsPerPage > _barangList.length)
                         ? _barangList.length
                         : startIndex + _itemsPerPage;
-                    final displayedList = _barangList.sublist(startIndex, endIndex);
-                    final totalPages = (_barangList.length / _itemsPerPage).ceil();
+                    final displayedList = _barangList.sublist(
+                      startIndex,
+                      endIndex,
+                    );
+                    final totalPages = (_barangList.length / _itemsPerPage)
+                        .ceil();
 
                     return Column(
                       children: [
@@ -225,7 +319,8 @@ class _BarangListScreenState extends State<BarangListScreen> {
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: displayedList.length,
-                          separatorBuilder: (ctx, i) => const SizedBox(height: 16),
+                          separatorBuilder: (ctx, i) =>
+                              const SizedBox(height: 16),
                           itemBuilder: (ctx, i) {
                             final b = displayedList[i];
                             final isLowStock = b.jumlah < 5;
@@ -234,39 +329,84 @@ class _BarangListScreenState extends State<BarangListScreen> {
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: const Color(0xFFF3F4F6)),
+                                border: Border.all(
+                                  color: const Color(0xFFF3F4F6),
+                                ),
                                 boxShadow: const [
-                                  BoxShadow(color: Color(0x08000000), offset: Offset(0, 1), blurRadius: 2),
+                                  BoxShadow(
+                                    color: Color(0x08000000),
+                                    offset: Offset(0, 1),
+                                    blurRadius: 2,
+                                  ),
                                 ],
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 2,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: const Color(0xFFF3F4F6),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
-                                    child: Text(b.bentuk.isEmpty ? 'Umum' : b.bentuk, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF4B5563))),
+                                    child: Text(
+                                      b.bentuk.isEmpty ? 'Umum' : b.bentuk,
+                                      style: const TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xFF4B5563),
+                                      ),
+                                    ),
                                   ),
                                   const SizedBox(height: 8),
-                                  Text(b.nama, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF0F172A), height: 1.2)),
+                                  Text(
+                                    b.nama,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF0F172A),
+                                      height: 1.2,
+                                    ),
+                                  ),
                                   const SizedBox(height: 4),
-                                  Text(rupiah(b.harga), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFF335C81))),
+                                  Text(
+                                    rupiah(b.harga),
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF66ACE6),
+                                    ),
+                                  ),
                                   const SizedBox(height: 12),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 10,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: const Color(0xFFF9FAFB),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          isLowStock ? 'Stok: ${b.jumlah} Unit (Low)' : 'Stok: ${b.jumlah} Unit',
-                                          style: TextStyle(fontSize: 12, fontWeight: isLowStock ? FontWeight.bold : FontWeight.w500, color: isLowStock ? const Color(0xFFEF4444) : const Color(0xFF475569)),
+                                          isLowStock
+                                              ? 'Stok: ${b.jumlah} Unit (Low)'
+                                              : 'Stok: ${b.jumlah} Unit',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: isLowStock
+                                                ? FontWeight.bold
+                                                : FontWeight.w500,
+                                            color: isLowStock
+                                                ? const Color(0xFFEF4444)
+                                                : const Color(0xFF475569),
+                                          ),
                                         ),
                                         Row(
                                           mainAxisSize: MainAxisSize.min,
@@ -274,20 +414,32 @@ class _BarangListScreenState extends State<BarangListScreen> {
                                             Material(
                                               color: Colors.transparent,
                                               child: InkWell(
-                                                borderRadius: BorderRadius.circular(20),
-                                                highlightColor: const Color(0xFF3B82F6).withOpacity(0.2),
-                                                splashColor: const Color(0xFF3B82F6).withOpacity(0.3),
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                                highlightColor: const Color(
+                                                  0xFF3B82F6,
+                                                ).withValues(alpha: 0.2),
+                                                splashColor: const Color(
+                                                  0xFF3B82F6,
+                                                ).withValues(alpha: 0.3),
                                                 onTap: () {
-                                                  showModalBottomSheet(
+                                                  showDialog(
                                                     context: context,
-                                                    isScrollControlled: true,
-                                                    backgroundColor: Colors.transparent,
-                                                    builder: (_) => _DetailBarangSheet(barang: b),
+                                                    barrierColor: Colors.black.withValues(alpha: 0.4),
+                                                    builder: (_) =>
+                                                        _DetailBarangSheet(
+                                                          barang: b,
+                                                        ),
                                                   );
                                                 },
                                                 child: const Padding(
                                                   padding: EdgeInsets.all(6.0),
-                                                  child: Icon(Icons.remove_red_eye_outlined, size: 18, color: Color(0xFF3B82F6)),
+                                                  child: Icon(
+                                                    Icons
+                                                        .remove_red_eye_outlined,
+                                                    size: 18,
+                                                    color: Color(0xFF3B82F6),
+                                                  ),
                                                 ),
                                               ),
                                             ),
@@ -295,24 +447,44 @@ class _BarangListScreenState extends State<BarangListScreen> {
                                             Material(
                                               color: Colors.transparent,
                                               child: InkWell(
-                                                borderRadius: BorderRadius.circular(20),
-                                                highlightColor: const Color(0xFFF59E0B).withOpacity(0.2),
-                                                splashColor: const Color(0xFFF59E0B).withOpacity(0.3),
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                                highlightColor: const Color(
+                                                  0xFFF59E0B,
+                                                ).withValues(alpha: 0.2),
+                                                splashColor: const Color(
+                                                  0xFFF59E0B,
+                                                ).withValues(alpha: 0.3),
                                                 onTap: () async {
-                                                  final res = await showModalBottomSheet<Barang>(
-                                                    context: context,
-                                                    isScrollControlled: true,
-                                                    backgroundColor: Colors.transparent,
-                                                    builder: (_) => _EditBarangSheet(barang: b),
-                                                  );
-                                                  if (res != null) {
-                                                    showEditSuccessModal(context);
+                                                  final res =
+                                                      await showModalBottomSheet<
+                                                        bool
+                                                      >(
+                                                        context: context,
+                                                        isScrollControlled:
+                                                            true,
+                                                        backgroundColor:
+                                                            Colors.transparent,
+                                                        builder: (_) =>
+                                                            BarangEditSheet(
+                                                              barang: b,
+                                                            ),
+                                                      );
+                                                  if (res == true &&
+                                                      context.mounted) {
+                                                    showEditSuccessModal(
+                                                      context,
+                                                    );
                                                     _fetchData();
                                                   }
                                                 },
                                                 child: const Padding(
                                                   padding: EdgeInsets.all(6.0),
-                                                  child: Icon(Icons.edit_outlined, size: 18, color: Color(0xFFF59E0B)),
+                                                  child: Icon(
+                                                    Icons.edit_outlined,
+                                                    size: 18,
+                                                    color: Color(0xFFF59E0B),
+                                                  ),
                                                 ),
                                               ),
                                             ),
@@ -320,13 +492,22 @@ class _BarangListScreenState extends State<BarangListScreen> {
                                             Material(
                                               color: Colors.transparent,
                                               child: InkWell(
-                                                borderRadius: BorderRadius.circular(20),
-                                                highlightColor: const Color(0xFFF87171).withOpacity(0.2),
-                                                splashColor: const Color(0xFFF87171).withOpacity(0.3),
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                                highlightColor: const Color(
+                                                  0xFFF87171,
+                                                ).withValues(alpha: 0.2),
+                                                splashColor: const Color(
+                                                  0xFFF87171,
+                                                ).withValues(alpha: 0.3),
                                                 onTap: () => _hapusBarang(b),
                                                 child: const Padding(
                                                   padding: EdgeInsets.all(6.0),
-                                                  child: Icon(Icons.delete_outline, size: 18, color: Color(0xFFEF4444)),
+                                                  child: Icon(
+                                                    Icons.delete_outline,
+                                                    size: 18,
+                                                    color: Color(0xFFEF4444),
+                                                  ),
                                                 ),
                                               ),
                                             ),
@@ -340,71 +521,172 @@ class _BarangListScreenState extends State<BarangListScreen> {
                             );
                           },
                         ),
-                        if (totalPages > 1) ...[
-                          const SizedBox(height: 32),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  border: Border.all(color: const Color(0xFFE2E8F0)),
-                                  borderRadius: BorderRadius.circular(8),
+                        if (totalPages > 1)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 24),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                // Previous Button
+                                InkWell(
+                                  onTap: _currentPage > 1
+                                      ? () => setState(() => _currentPage--)
+                                      : null,
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Container(
+                                    width: 48,
+                                    height: 48,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: _currentPage > 1
+                                            ? AppColors.primary.withValues(alpha: 0.3)
+                                            : const Color(0xFFE2E8F0),
+                                      ),
+                                    ),
+                                    child: Icon(
+                                      Icons.arrow_back_ios_new,
+                                      size: 18,
+                                      color: _currentPage > 1
+                                          ? AppColors.primary
+                                          : const Color(0xFFC4C6CF),
+                                    ),
+                                  ),
                                 ),
-                                child: IconButton(
-                                  icon: const Icon(Icons.chevron_left),
-                                  color: _currentPage > 1 ? const Color(0xFF335C81) : const Color(0xFFCBD5E1),
-                                  onPressed: _currentPage > 1 ? () => setState(() => _currentPage--) : null,
+                                const SizedBox(width: 12),
+
+                                // Page Numbers
+                                ...List.generate(totalPages, (index) {
+                                  int pageNumber = index + 1;
+                                  bool isActive = pageNumber == _currentPage;
+
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: 12),
+                                    child: InkWell(
+                                      onTap: () => setState(() => _currentPage = pageNumber),
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Container(
+                                        width: 48,
+                                        height: 48,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(12),
+                                          color: isActive
+                                              ? AppColors.primary
+                                              : const Color(
+                                                  0xFFD3E4FE,
+                                                ).withValues(alpha: 0.5),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            '$pageNumber',
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: isActive
+                                                  ? FontWeight.bold
+                                                  : FontWeight.w500,
+                                              color: isActive
+                                                  ? Colors.white
+                                                  : const Color(0xFF44474E),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }),
+
+                                // Next Button
+                                InkWell(
+                                  onTap: _currentPage < totalPages
+                                      ? () => setState(() => _currentPage++)
+                                      : null,
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Container(
+                                    width: 48,
+                                    height: 48,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: _currentPage < totalPages
+                                            ? AppColors.primary.withValues(alpha: 0.3)
+                                            : const Color(0xFFE2E8F0),
+                                      ),
+                                    ),
+                                    child: Icon(
+                                      Icons.arrow_forward_ios,
+                                      size: 18,
+                                      color: _currentPage < totalPages
+                                          ? AppColors.primary
+                                          : const Color(0xFFC4C6CF),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 16),
-                              Text(
-                                'Halaman $_currentPage dari $totalPages',
-                                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF475569)),
-                              ),
-                              const SizedBox(width: 16),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  border: Border.all(color: const Color(0xFFE2E8F0)),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: IconButton(
-                                  icon: const Icon(Icons.chevron_right),
-                                  color: _currentPage < totalPages ? const Color(0xFF335C81) : const Color(0xFFCBD5E1),
-                                  onPressed: _currentPage < totalPages ? () => setState(() => _currentPage++) : null,
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ],
                       ],
                     );
                   },
                 ),
 
               // Footer
-              const SizedBox(height: 48),
-              const Center(
+              const SizedBox(height: 32),
+              const Divider(color: Color(0xFFE2E8F0), thickness: 1),
+              const SizedBox(height: 32),
+              Center(
                 child: Column(
                   children: [
-                    Text('Gudang Damar', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF335C81))),
-                    SizedBox(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('Kebijakan Privasi', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF475569))),
-                        SizedBox(width: 16),
-                        Text('Syarat & Ketentuan', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF475569))),
-                        SizedBox(width: 16),
-                        Text('Pengiriman', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF475569))),
-                        SizedBox(width: 16),
-                        Text('FAQ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF475569))),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.asset(
+                            'assets/images/LogoDamar.jpeg',
+                            height: 48,
+                            width: 48,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => const Icon(
+                              Icons.broken_image,
+                              size: 48,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        const Text(
+                          'Gudang Damar',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF003EA8), // on-tertiary-fixed-variant
+                          ),
+                        ),
                       ],
                     ),
-                    SizedBox(height: 16),
-                    Text('© 2024 Gudang Damar. Crafting\nKitchen Excellence.', textAlign: TextAlign.center, style: TextStyle(fontSize: 10, color: Color(0xFF94A3B8), height: 1.5)),
-                    SizedBox(height: 32),
+                    const SizedBox(height: 24),
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 24,
+                      runSpacing: 12,
+                      children: [
+                        _buildFooterLink('Kebijakan Privasi'),
+                        _buildFooterLink('Syarat & Ketentuan'),
+                        _buildFooterLink('Pengiriman'),
+                        _buildFooterLink('FAQ'),
+                        _buildFooterLink('Report Issue'),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      '© 2026 Gudang Damar. All rights reserved.',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Color(0xB344474E), // on-surface-variant/70
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 32),
                   ],
                 ),
               ),
@@ -412,32 +694,70 @@ class _BarangListScreenState extends State<BarangListScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          border: Border(top: BorderSide(color: Color(0xFFE5E7EB), width: 1)),
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.white,
+        selectedItemColor: const Color(0xFF1E3A8A),
+        unselectedItemColor: const Color(0xFF64748B),
+        selectedLabelStyle: const TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 12,
         ),
-        child: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.white,
-          selectedItemColor: const Color(0xFF335C81),
-          unselectedItemColor: const Color(0xFF94A3B8),
-          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 10),
-          unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 10),
-          currentIndex: 0, // Inventory
-          onTap: (index) {
-            if (index == 3) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const RiwayatAktivitasScreen()),
-              );
-            }
-          },
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.grid_view, size: 24), label: 'Inventory'),
-            BottomNavigationBarItem(icon: Icon(Icons.settings_outlined, size: 24), label: 'Service'),
-            BottomNavigationBarItem(icon: Icon(Icons.shopping_cart_outlined, size: 24), label: 'Orders'),
-            BottomNavigationBarItem(icon: Icon(Icons.insert_chart_outlined, size: 24), label: 'Activity'),
-          ],
+        unselectedLabelStyle: const TextStyle(
+          fontWeight: FontWeight.w500,
+          fontSize: 12,
+        ),
+        currentIndex: 0, // Inventory
+        onTap: (index) {
+          if (index == 1) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const ServisListScreen()),
+            );
+          } else if (index == 2) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const PesananListScreen()),
+            );
+          } else if (index == 3) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const RiwayatAktivitasScreen(),
+              ),
+            );
+          }
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.inventory_2_outlined),
+            label: 'Inventory',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.build_circle_outlined),
+            label: 'Service',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart_outlined),
+            label: 'Orders',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.insert_chart_outlined),
+            label: 'Activity',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFooterLink(String text) {
+    return InkWell(
+      onTap: () {},
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontSize: 14,
+          color: Color(0xFF44474E), // on-surface-variant
         ),
       ),
     );
@@ -449,201 +769,182 @@ class _DetailBarangSheet extends StatelessWidget {
   final Barang barang;
   const _DetailBarangSheet({required this.barang});
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildDetailRow(String label, String value, {Color valueColor = const Color(0xFF121C2A)}) {
     return Container(
-      margin: const EdgeInsets.all(12),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(20)),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Detail Barang', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context)),
-              ],
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEFF4FF), // surface-container-low
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFFC0C7D1).withValues(alpha: 0.2)), // outline-variant/20
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 14,
+              color: Color(0xFF40474F), // on-surface-variant
             ),
-            const Divider(),
-            InfoRow(label: 'Nama Barang', value: barang.nama, bold: true),
-            InfoRow(label: 'Guna/Merek', value: barang.gunaMerek),
-            InfoRow(label: 'Kategori', value: '${barang.bentuk} - ${barang.bahan}'),
-            InfoRow(label: 'Ukuran', value: '${barang.ukuran}'),
-            InfoRow(label: 'Ketebalan', value: barang.ketebalan),
-            const SectionDivider(title: 'Stok & Harga'),
-            InfoRow(label: 'Harga Satuan', value: rupiah(barang.harga), valueColor: AppColors.success, bold: true),
-            InfoRow(label: 'Stok Tersedia', value: '${barang.jumlah} Unit', valueColor: AppColors.primary, bold: true),
-            InfoRow(label: 'Total Nilai Stok', value: rupiah(barang.total)),
-            const SectionDivider(title: 'Statistik Penjualan'),
-            InfoRow(label: 'Terjual', value: '${barang.jumlahTerjual} Unit'),
-            InfoRow(label: 'Pendapatan', value: rupiah(barang.pendapatan), valueColor: AppColors.warningDark),
-            const SizedBox(height: 16),
-            AppButton(
-              label: 'Tutup',
-              onPressed: () => Navigator.pop(context),
-              color: AppColors.border,
-              textColor: AppColors.textSecondary,
-              width: double.infinity,
-            )
-          ],
-        ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: valueColor,
+            ),
+          ),
+        ],
       ),
     );
   }
-}
 
-// ─── Edit Popup ─────────────────────────────────────────────────────────────
-class _EditBarangSheet extends StatefulWidget {
-  final Barang barang;
-  const _EditBarangSheet({required this.barang});
-
-  @override
-  State<_EditBarangSheet> createState() => _EditBarangSheetState();
-}
-
-class _EditBarangSheetState extends State<_EditBarangSheet> {
-  final _service = BarangService();
-  bool _loading = false;
-
-  late final TextEditingController _nama;
-  late final TextEditingController _merek;
-  late final TextEditingController _ukuran;
-  late final TextEditingController _ketebalan;
-  late final TextEditingController _bentuk;
-  late final TextEditingController _bahan;
-  late final TextEditingController _harga;
-  late final TextEditingController _jumlah;
-
-  String? _namaError;
-  String? _merekError;
-  String? _ukuranError;
-  String? _ketebalanError;
-  String? _bentukError;
-  String? _bahanError;
-  String? _hargaError;
-  String? _jumlahError;
-
-  @override
-  void initState() {
-    super.initState();
-    final b = widget.barang;
-    _nama = TextEditingController(text: b.nama);
-    _merek = TextEditingController(text: b.gunaMerek);
-    _ukuran = TextEditingController(text: b.ukuran.toString());
-    _ketebalan = TextEditingController(text: b.ketebalan);
-    _bentuk = TextEditingController(text: b.bentuk);
-    _bahan = TextEditingController(text: b.bahan);
-    _harga = TextEditingController(text: b.harga.toString());
-    _jumlah = TextEditingController(text: b.jumlah.toString());
-  }
-
-  @override
-  void dispose() {
-    for (final c in [_nama, _merek, _ukuran, _ketebalan, _bentuk, _bahan, _harga, _jumlah]) {
-      c.dispose();
-    }
-    super.dispose();
-  }
-
-  Future<void> _submit() async {
-    setState(() {
-      _namaError = _nama.text.trim().isEmpty ? 'Wajib diisi ya ganteng' : null;
-      _merekError = _merek.text.trim().isEmpty ? 'Wajib diisi' : null;
-      _ukuranError = _ukuran.text.trim().isEmpty ? 'Wajib diisi' : null;
-      _ketebalanError = _ketebalan.text.trim().isEmpty ? 'Wajib diisi' : null;
-      _bentukError = _bentuk.text.trim().isEmpty ? 'Wajib diisi' : null;
-      _bahanError = _bahan.text.trim().isEmpty ? 'Wajib diisi' : null;
-      _hargaError = _harga.text.trim().isEmpty ? 'Wajib diisi' : null;
-      _jumlahError = _jumlah.text.trim().isEmpty ? 'Wajib diisi' : null;
-    });
-
-    if (_namaError != null ||
-        _merekError != null ||
-        _ukuranError != null ||
-        _ketebalanError != null ||
-        _bentukError != null ||
-        _bahanError != null ||
-        _hargaError != null ||
-        _jumlahError != null) {
-      return;
-    }
-    setState(() => _loading = true);
-    try {
-      final updated = await _service.update(
-        widget.barang.idBarang,
-        nama: _nama.text.trim(),
-        gunaMerek: _merek.text.trim(),
-        ukuran: int.tryParse(_ukuran.text) ?? 0,
-        ketebalan: _ketebalan.text.trim(),
-        bentuk: _bentuk.text.trim(),
-        bahan: _bahan.text.trim(),
-        harga: int.tryParse(_harga.text) ?? 0,
-        jumlah: int.tryParse(_jumlah.text) ?? 0,
-      );
-      if (mounted) Navigator.pop(context, updated);
-    } catch (e) {
-      if (mounted) showError(context, e.toString());
-    } finally {
-      if (mounted) setState(() => _loading = false);
-    }
+  Widget _buildSectionHeader(String title) {
+    return Row(
+      children: [
+        Text(
+          title.toUpperCase(),
+          style: const TextStyle(
+            fontSize: 12, // label-md
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+            color: Color(0xFF717880), // outline
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Container(
+            height: 1,
+            color: const Color(0xFFC0C7D1).withValues(alpha: 0.3), // outline-variant/30
+          ),
+        ),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final bottom = MediaQuery.of(context).viewInsets.bottom;
-    return LoadingOverlay(
-      isLoading: _loading,
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.all(16),
       child: Container(
-        margin: const EdgeInsets.all(12),
-        padding: EdgeInsets.only(left: 20, right: 20, top: 20, bottom: bottom + 20),
-        decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(20)),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+        width: double.infinity,
+        constraints: const BoxConstraints(maxWidth: 480, maxHeight: 800),
+        decoration: BoxDecoration(
+          color: Colors.white, // surface-container-lowest
+          borderRadius: BorderRadius.circular(12), // rounded-xl
+          border: Border.all(color: const Color(0xFFC0C7D1).withValues(alpha: 0.3)), // outline-variant/30
+          boxShadow: const [
+            BoxShadow(color: Colors.black12, offset: Offset(0, 10), blurRadius: 20),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: const Color(0xFFC0C7D1).withValues(alpha: 0.3), // outline-variant/30
+                  ),
+                ),
+              ),
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Edit Barang', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
-                  IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.close)),
+                  const Text(
+                    'Detail Barang',
+                    style: TextStyle(
+                      fontSize: 20, // title-lg
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF121C2A), // on-surface
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () => Navigator.pop(context),
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Center(
+                        child: Icon(Icons.close, color: Color(0xFF40474F)), // on-surface-variant
+                      ),
+                    ),
+                  ),
                 ],
               ),
-              const SizedBox(height: 16),
-              AppTextField(label: 'Nama Barang', controller: _nama, errorText: _namaError),
-              const SizedBox(height: 12),
-              AppTextField(label: 'Merek / Guna', controller: _merek, errorText: _merekError),
-              const SizedBox(height: 16),
-              const SectionDivider(title: 'Harga & Stok'),
-              Row(children: [
-                Expanded(child: AppTextField(label: 'Harga (Rp)', controller: _harga, isNumber: true, errorText: _hargaError)),
-                const SizedBox(width: 12),
-                Expanded(child: AppTextField(label: 'Jumlah', controller: _jumlah, isNumber: true, errorText: _jumlahError)),
-              ]),
-              const SizedBox(height: 16),
-              const SectionDivider(title: 'Kategori'),
-              Row(children: [
-                Expanded(child: AppTextField(label: 'Ukuran', controller: _ukuran, isNumber: true, errorText: _ukuranError)),
-                const SizedBox(width: 12),
-                Expanded(child: AppTextField(label: 'Bentuk', controller: _bentuk, errorText: _bentukError)),
-              ]),
-              const SizedBox(height: 12),
-              Row(children: [
-                Expanded(child: AppTextField(label: 'Ketebalan', controller: _ketebalan, errorText: _ketebalanError)),
-                const SizedBox(width: 12),
-                Expanded(child: AppTextField(label: 'Bahan', controller: _bahan, errorText: _bahanError)),
-              ]),
-              const SizedBox(height: 24),
-              Row(children: [
-                Expanded(child: AppButton(label: 'Update', onPressed: _submit, icon: Icons.save, width: double.infinity)),
-                const SizedBox(width: 10),
-                Expanded(child: AppButton(label: 'Batal', onPressed: () => Navigator.pop(context), color: AppColors.border, textColor: AppColors.textSecondary, width: double.infinity)),
-              ]),
-            ],
-          ),
+            ),
+            
+            // Content
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Info List
+                    _buildDetailRow('Nama Barang', barang.nama),
+                    const SizedBox(height: 12),
+                    _buildDetailRow('Guna/Merek', barang.gunaMerek.isNotEmpty ? barang.gunaMerek : '-'),
+                    const SizedBox(height: 12),
+                    _buildDetailRow('Bahan', barang.bahan.isNotEmpty ? barang.bahan : '-'),
+                    const SizedBox(height: 12),
+                    _buildDetailRow('Bentuk', barang.bentuk.isNotEmpty ? barang.bentuk : '-'),
+                    const SizedBox(height: 12),
+                    _buildDetailRow('Ukuran', '${barang.ukuran}'),
+                    const SizedBox(height: 12),
+                    _buildDetailRow('Ketebalan', barang.ketebalan.isNotEmpty ? barang.ketebalan : '-'),
+                    
+                    const SizedBox(height: 24),
+                    _buildSectionHeader('Stok & Harga'),
+                    const SizedBox(height: 12),
+                    _buildDetailRow('Harga Satuan', rupiah(barang.harga), valueColor: const Color(0xFF66ACE6)),
+                    const SizedBox(height: 12),
+                    _buildDetailRow('Stok Tersedia', '${barang.jumlah} Unit', valueColor: const Color(0xFF66ACE6)),
+                    const SizedBox(height: 12),
+                    _buildDetailRow('Total Nilai Stok', rupiah(barang.total)),
+
+                    const SizedBox(height: 24),
+                    _buildSectionHeader('Statistik Penjualan'),
+                    const SizedBox(height: 12),
+                    _buildDetailRow('Terjual', '${barang.jumlahTerjual} Unit'),
+                    const SizedBox(height: 12),
+                    _buildDetailRow('Pendapatan', rupiah(barang.pendapatan), valueColor: const Color(0xFFE79400)), // tertiary-container
+                  ],
+                ),
+              ),
+            ),
+            
+            // Footer
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF66ACE6), // primary-container
+                  foregroundColor: const Color(0xFF003F63), // on-primary-container
+                  elevation: 2, // shadow-md
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12), // rounded-xl
+                  ),
+                  minimumSize: const Size(double.infinity, 56), // py-4
+                ),
+                child: const Text(
+                  'Tutup',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/barang.dart';
 import '../../services/barang_service.dart';
-import '../../widgets/shared.dart';
+import '../../widgets/inventory_shared.dart';
 
 Future<Barang?> showTambahBarangDialog(BuildContext context) async {
   return showModalBottomSheet<Barang>(
@@ -13,7 +13,7 @@ Future<Barang?> showTambahBarangDialog(BuildContext context) async {
 }
 
 class _TambahBarangSheet extends StatefulWidget {
-  const _TambahBarangSheet({super.key});
+  const _TambahBarangSheet();
 
   @override
   State<_TambahBarangSheet> createState() => _TambahBarangSheetState();
@@ -119,7 +119,7 @@ class _TambahBarangSheetState extends State<_TambahBarangSheet> {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.12),
+                          color: AppColors.primary.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(10)),
                       child: const Icon(Icons.add_box_rounded,
                           color: AppColors.primary, size: 20),
@@ -228,3 +228,4 @@ class _TambahBarangSheetState extends State<_TambahBarangSheet> {
     );
   }
 }
+

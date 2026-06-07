@@ -105,6 +105,40 @@ class BarangService {
     }
   }
 
+  Future<Barang> updateStok(int idBarang, int jumlahBaru) async {
+    final uri = Uri.parse('${ApiConfig.apiUrl}/barang/$idBarang/stok');
+    final response = await http.post(
+      uri,
+      headers: await _getHeaders(),
+      body: jsonEncode({'jumlah': jumlahBaru}),
+    ).timeout(ApiConfig.timeout);
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      return Barang.fromJson(json['data']);
+    } else {
+      final errorMsg = _parseError(response.body);
+      throw Exception('Gagal update stok: $errorMsg');
+    }
+  }
+
+  Future<Barang> catatPenjualan(int idBarang, int jumlahTerjual) async {
+    final uri = Uri.parse('${ApiConfig.apiUrl}/barang/$idBarang/penjualan');
+    final response = await http.post(
+      uri,
+      headers: await _getHeaders(),
+      body: jsonEncode({'jumlah_terjual': jumlahTerjual}),
+    ).timeout(ApiConfig.timeout);
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      return Barang.fromJson(json['data']);
+    } else {
+      final errorMsg = _parseError(response.body);
+      throw Exception('Gagal catat penjualan: $errorMsg');
+    }
+  }
+
   Future<void> delete(int idBarang) async {
     final uri = Uri.parse('${ApiConfig.apiUrl}/barang/$idBarang');
     final response = await http
@@ -126,3 +160,4 @@ class BarangService {
     }
   }
 }
+

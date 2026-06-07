@@ -4,8 +4,8 @@ import 'dart:ui';
 
 // ─── Color palette ────────────────────────────────────────────────────────────
 class AppColors {
-  static const primary = Color(0xFF3B82F6);
-  static const primaryDark = Color(0xFF2563EB);
+  static const primary = Color(0xFF66ACE6);
+  static const primaryDark = Color(0xFF4B94D1);
   static const success = Color(0xFF22C55E);
   static const successDark = Color(0xFF16A34A);
   static const warning = Color(0xFFF59E0B);
@@ -15,11 +15,16 @@ class AppColors {
   static const orange = Color(0xFFF97316);
   static const orangeDark = Color(0xFFEA580C);
   static const surface = Color(0xFFFFFFFF);
-  static const background = Color(0xFFF8FAFC);
+  static const background = Color(0xFFF5F7FA);
   static const border = Color(0xFFE2E8F0);
-  static const textPrimary = Color(0xFF1E293B);
-  static const textSecondary = Color(0xFF64748B);
-  static const textMuted = Color(0xFF94A3B8);
+  static const textPrimary = Color(0xFF1F2937);
+  static const textSecondary = Color(0xFF6B7280);
+  static const textMuted = Color(0xFF9CA3AF);
+
+  // Dashboard stat card backgrounds
+  static const cardBlue = Color(0xFFDBEAFE);
+  static const cardOrange = Color(0xFFFFEDD5);
+  static const cardGreen = Color(0xFFDCFCE7);
 }
 
 // ─── Rupiah formatter ─────────────────────────────────────────────────────────
@@ -243,7 +248,7 @@ class LoadingOverlay extends StatelessWidget {
       child,
       if (isLoading)
         Container(
-          color: Colors.black.withOpacity(0.35),
+          color: Colors.black.withValues(alpha: 0.35),
           child: const Center(
             child: CircularProgressIndicator(color: Colors.white),
           ),
@@ -339,9 +344,9 @@ class BadgeChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Text(label,
           style: TextStyle(
@@ -353,7 +358,7 @@ class BadgeChip extends StatelessWidget {
 }
 
 // ─── Premium Success Modal ────────────────────────────────────────────────────
-Future<void> showPremiumSuccessModal(BuildContext context) {
+Future<void> showPremiumSuccessModal(BuildContext context, {String? title, String? subtitle}) {
   return showGeneralDialog(
     context: context,
     barrierDismissible: true,
@@ -368,7 +373,7 @@ Future<void> showPremiumSuccessModal(BuildContext context) {
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
               child: Container(
-                color: const Color(0xFF335C81).withOpacity(0.1),
+                color: const Color(0xFF66ACE6).withValues(alpha: 0.1),
               ),
             ),
           ),
@@ -384,7 +389,7 @@ Future<void> showPremiumSuccessModal(BuildContext context) {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Colors.white.withOpacity(0.5)),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.5)),
                   boxShadow: const [
                     BoxShadow(color: Color(0x0D000000), offset: Offset(0, 20), blurRadius: 25, spreadRadius: -5),
                     BoxShadow(color: Color(0x05000000), offset: Offset(0, 10), blurRadius: 10, spreadRadius: -5),
@@ -403,10 +408,10 @@ Future<void> showPremiumSuccessModal(BuildContext context) {
                           height: 120,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: const Color(0xFFDCFCE7).withOpacity(0.5),
+                            color: const Color(0xFFDCFCE7).withValues(alpha: 0.5),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFFDCFCE7).withOpacity(0.5),
+                                color: const Color(0xFFDCFCE7).withValues(alpha: 0.5),
                                 blurRadius: 24,
                                 spreadRadius: 12,
                               )
@@ -424,7 +429,7 @@ Future<void> showPremiumSuccessModal(BuildContext context) {
                               end: Alignment.bottomRight,
                               colors: [Color(0xFFF0FDF4), Color(0xFFDCFCE7)],
                             ),
-                            border: Border.all(color: const Color(0xFFBBF7D0).withOpacity(0.5)),
+                            border: Border.all(color: const Color(0xFFBBF7D0).withValues(alpha: 0.5)),
                           ),
                           child: const Center(
                             child: Icon(Icons.check_circle_outline, color: Color(0xFF16A34A), size: 40),
@@ -435,10 +440,10 @@ Future<void> showPremiumSuccessModal(BuildContext context) {
                     const SizedBox(height: 24),
                     
                     // Content
-                    const Text(
-                      'Barang Berhasil Ditambah',
+                    Text(
+                      title ?? 'Barang Berhasil Ditambah',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 24, 
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF0F172A),
@@ -449,19 +454,19 @@ Future<void> showPremiumSuccessModal(BuildContext context) {
                     
                     RichText(
                       textAlign: TextAlign.center,
-                      text: const TextSpan(
-                        style: TextStyle(
+                      text: TextSpan(
+                        style: const TextStyle(
                           fontSize: 15,
                           color: Color(0xFF64748B),
                           height: 1.6,
                         ),
                         children: [
-                          TextSpan(text: 'Item baru telah berhasil tercatat dalam database inventaris '),
-                          TextSpan(
+                          TextSpan(text: subtitle ?? 'Item baru telah berhasil tercatat dalam database inventaris '),
+                          const TextSpan(
                             text: 'Gudang Damar',
-                            style: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF335C81)),
+                            style: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF66ACE6)),
                           ),
-                          TextSpan(text: '.'),
+                          const TextSpan(text: '.'),
                         ],
                       ),
                     ),
@@ -473,11 +478,11 @@ Future<void> showPremiumSuccessModal(BuildContext context) {
                       child: ElevatedButton(
                         onPressed: () => Navigator.pop(context),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF335C81),
+                          backgroundColor: const Color(0xFF66ACE6),
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           elevation: 10,
-                          shadowColor: const Color(0xFF335C81).withOpacity(0.3),
+                          shadowColor: const Color(0xFF66ACE6).withValues(alpha: 0.3),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -535,7 +540,7 @@ Widget _buildBrandDot() {
     width: 6,
     height: 6,
     decoration: BoxDecoration(
-      color: const Color(0xFF335C81).withOpacity(0.3),
+      color: const Color(0xFF66ACE6).withValues(alpha: 0.3),
       shape: BoxShape.circle,
     ),
   );
@@ -557,7 +562,7 @@ Future<void> showEditSuccessModal(BuildContext context) {
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
               child: Container(
-                color: const Color(0xFF0F172A).withOpacity(0.4),
+                color: const Color(0xFF0F172A).withValues(alpha: 0.4),
               ),
             ),
           ),
@@ -645,11 +650,11 @@ Future<void> showEditSuccessModal(BuildContext context) {
                       child: ElevatedButton(
                         onPressed: () => Navigator.pop(context),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF335C81),
+                          backgroundColor: const Color(0xFF66ACE6),
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           elevation: 8,
-                          shadowColor: const Color(0xFF1E3A8A).withOpacity(0.2), // blue-900/20
+                          shadowColor: const Color(0xFF1E3A8A).withValues(alpha: 0.2), // blue-900/20
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -701,197 +706,186 @@ Widget _buildEditBrandDot() {
     width: 6,
     height: 6,
     decoration: BoxDecoration(
-      color: const Color(0xFF94A3B8).withOpacity(0.2), // slate-400 with opacity 20
+      color: const Color(0xFF94A3B8).withValues(alpha: 0.2), // slate-400 with opacity 20
       shape: BoxShape.circle,
     ),
   );
 }
 
+
+
 // ─── Premium Delete Confirm Modal ─────────────────────────────────────────────
-Future<bool> showPremiumDeleteConfirmModal(BuildContext context, String itemName) async {
-  final result = await showGeneralDialog<bool>(
+
+
+// ─── Loading Modal ────────────────────────────────────────────────────────────
+void showLoadingModal(BuildContext context) {
+  showDialog(
     context: context,
-    barrierDismissible: true,
-    barrierLabel: 'Dismiss',
-    barrierColor: Colors.transparent,
+    barrierDismissible: false,
+    builder: (context) {
+      return Center(
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 20)],
+          ),
+          child: const Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(color: AppColors.primary),
+              SizedBox(height: 16),
+              Text('Menyimpan Data...', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+// ─── Premium Success Modal ────────────────────────────────────────────────────
+Future<void> showPremiumServisSuccessModal(BuildContext context, Map<String, dynamic> data, {bool isEdit = false}) async {
+  await showGeneralDialog(
+    context: context,
+    barrierDismissible: false,
+    barrierLabel: 'Success',
+    barrierColor: Colors.black.withValues(alpha: 0.4),
     transitionDuration: const Duration(milliseconds: 300),
     pageBuilder: (context, animation, secondaryAnimation) {
-      return Stack(
-        children: [
-          // Backdrop with sophisticated blur
-          Positioned.fill(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-              child: Container(
-                color: const Color(0xFF335C81).withOpacity(0.1),
-              ),
+      return Center(
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            width: double.infinity,
+            constraints: const BoxConstraints(maxWidth: 480),
+            margin: const EdgeInsets.symmetric(horizontal: 24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFC4C6CF).withValues(alpha: 0.3)),
+              boxShadow: const [BoxShadow(color: Color(0x14001E40), offset: Offset(0, 8), blurRadius: 32)],
             ),
-          ),
-          // Modal Card
-          Center(
-            child: Material(
-              color: Colors.transparent,
-              child: Container(
-                width: double.infinity,
-                constraints: const BoxConstraints(maxWidth: 360),
-                margin: const EdgeInsets.symmetric(horizontal: 24),
-                padding: const EdgeInsets.all(32),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Colors.white.withOpacity(0.5)),
-                  boxShadow: const [
-                    BoxShadow(color: Color(0x0D000000), offset: Offset(0, 20), blurRadius: 25, spreadRadius: -5),
-                    BoxShadow(color: Color(0x05000000), offset: Offset(0, 10), blurRadius: 10, spreadRadius: -5),
-                  ],
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Header
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 32, 20, 16),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE6F3FD),
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            if (isEdit)
+                              const BoxShadow(color: Color(0x3366ACE6), blurRadius: 40)
+                          ],
+                        ),
+                        child: Center(
+                          child: Icon(isEdit ? Icons.check : Icons.check_circle, size: isEdit ? 32 : 48, color: AppColors.primary),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        isEdit ? 'Berhasil Diperbarui! 🥳' : 'Berhasil Tersimpan! 🎉',
+                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        isEdit ? 'Data servis telah berhasil diperbarui dalam sistem.' : 'Data servis telah berhasil ditambahkan ke dalam sistem.',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 14, color: AppColors.textSecondary),
+                      ),
+                    ],
+                  ),
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Premium Warning/Delete Icon
-                    Stack(
-                      alignment: Alignment.center,
+                
+                // Details Card
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: AppColors.background,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: const Color(0xFFC4C6CF).withValues(alpha: 0.5)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Blur glow
-                        Container(
-                          width: 120,
-                          height: 120,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: const Color(0xFFFEE2E2).withOpacity(0.5), // red-100/50
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFFFEE2E2).withOpacity(0.5),
-                                blurRadius: 24,
-                                spreadRadius: 12,
-                              )
-                            ],
-                          ),
+                        Row(
+                          children: const [
+                            Icon(Icons.inventory_2, color: AppColors.primary, size: 20),
+                            SizedBox(width: 8),
+                            Text('DETAIL SERVIS', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.primary, letterSpacing: 1)),
+                          ],
                         ),
-                        // Inner circle
-                        Container(
-                          width: 80,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: const LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [Color(0xFFFEF2F2), Color(0xFFFEE2E2)], // red-50 to red-100
-                            ),
-                            border: Border.all(color: const Color(0xFFFECACA).withOpacity(0.5)), // red-200/50
-                          ),
-                          child: const Center(
-                            child: Icon(Icons.delete_outline, color: Color(0xFFDC2626), size: 40), // red-600, trash can
-                          ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8),
+                          child: Divider(color: Color(0x4DC4C6CF)),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    
-                    // Content
-                    const Text(
-                      'Hapus Barang?',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 24, 
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF0F172A),
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    
-                    RichText(
-                      textAlign: TextAlign.center,
-                      text: TextSpan(
-                        style: const TextStyle(
-                          fontSize: 15,
-                          color: Color(0xFF64748B),
-                          height: 1.6,
-                        ),
-                        children: [
-                          const TextSpan(text: 'Apakah Anda yakin ingin menghapus '),
-                          TextSpan(
-                            text: itemName,
-                            style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF335C81)),
-                          ),
-                          const TextSpan(text: '? Data yang dihapus tidak dapat dipulihkan.'),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-                    
-                    // Action Buttons (Column)
-                    Column(
-                      children: [
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () => Navigator.pop(context, true),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFDC2626), // red-600
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              elevation: 10,
-                              shadowColor: const Color(0xFFDC2626).withOpacity(0.2),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            child: const Text(
-                              'Hapus',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
+                        _buildDetailRow('Nama Barang', data['nama_barang'] ?? '-', bold: true, valueColor: AppColors.primary),
                         const SizedBox(height: 12),
-                        SizedBox(
+                        _buildDetailRow('Bahan', data['bahan'] ?? '-'),
+                        const SizedBox(height: 12),
+                        _buildDetailRow('Jumlah', '${data['jumlah'] ?? 1}'),
+                        const SizedBox(height: 12),
+                        _buildDetailRow('Bentuk', data['bentuk_barang']?.toString().isEmpty ?? true ? '-' : data['bentuk_barang']),
+                        const SizedBox(height: 12),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8),
+                          child: Divider(color: Color(0x33C4C6CF)),
+                        ),
+                        _buildDetailRow('Harga', rupiah(data['harga'] ?? 0), bold: true, valueColor: AppColors.primary),
+                        const SizedBox(height: 12),
+                        const Text('CATATAN', style: TextStyle(fontSize: 12, color: AppColors.textSecondary, letterSpacing: 1)),
+                        const SizedBox(height: 4),
+                        Container(
                           width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () => Navigator.pop(context, false),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFF3F4F6), // gray-100
-                              foregroundColor: const Color(0xFF334155), // slate-700
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            child: const Text(
-                              'Batal',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                            ),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: const Color(0xFFC4C6CF).withValues(alpha: 0.3)),
                           ),
+                          child: Text(data['catatan']?.toString().isEmpty ?? true ? '-' : data['catatan'], style: const TextStyle(fontSize: 14, color: AppColors.textPrimary)),
                         ),
                       ],
                     ),
-                    
-                    // Subtle Brand Element
-                    const SizedBox(height: 24),
-                    Container(
-                      padding: const EdgeInsets.only(top: 24),
-                      decoration: const BoxDecoration(
-                        border: Border(top: BorderSide(color: Color(0xFFF8FAFC))),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _buildBrandDot(),
-                          const SizedBox(width: 6),
-                          _buildBrandDot(),
-                          const SizedBox(width: 6),
-                          _buildBrandDot(),
-                        ],
+                  ),
+                ),
+                
+                // Action Button
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: const BoxDecoration(
+                    color: AppColors.background,
+                    border: Border(top: BorderSide(color: Color(0x33C4C6CF))),
+                  ),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.check, size: 20),
+                      label: const Text('Mengerti', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
-        ],
+        ),
       );
     },
     transitionBuilder: (context, animation, secondaryAnimation, child) {
@@ -907,6 +901,26 @@ Future<bool> showPremiumDeleteConfirmModal(BuildContext context, String itemName
       );
     },
   );
-  
-  return result ?? false;
 }
+
+Widget _buildDetailRow(String label, String value, {bool bold = false, Color? valueColor}) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Text(label.toUpperCase(), style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, letterSpacing: 1)),
+      Text(
+        value, 
+        style: TextStyle(
+          fontSize: 14, 
+          fontWeight: bold ? FontWeight.bold : FontWeight.w500, 
+          color: valueColor ?? AppColors.textPrimary
+        )
+      ),
+    ],
+  );
+}
+
+
+
+
+

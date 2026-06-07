@@ -22,7 +22,7 @@ class AuthScaffold extends StatelessWidget {
 
           // Overlay gelap biar teks & card tetap terbaca
           Container(
-            color: Colors.black.withOpacity(0.45),
+            color: Colors.black.withValues(alpha: 0.45),
           ),
 
           // Konten
@@ -74,7 +74,7 @@ class AuthScaffold extends StatelessWidget {
                         '© 2026 Gudang Damar',
                         style: TextStyle(
                           fontSize: 11,
-                          color: Colors.white.withOpacity(0.85),
+                          color: Colors.white.withValues(alpha: 0.85),
                         ),
                       ),
                     ],
@@ -99,9 +99,9 @@ class GlassCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.25),
+        color: Colors.white.withValues(alpha: 0.25),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.5)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.5)),
         boxShadow: const [
           BoxShadow(
             color: Colors.black26,
@@ -210,3 +210,6 @@ InputDecoration authInputDecoration(String hint) => InputDecoration(
         borderSide: const BorderSide(color: AppColors.primaryDark, width: 1.5),
       ),
     );
+
+
+

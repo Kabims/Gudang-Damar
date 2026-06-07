@@ -208,7 +208,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textSecondary.withOpacity(0.8),
+                      color: AppColors.textSecondary.withValues(alpha: 0.8),
                       letterSpacing: 0.5,
                     ),
                   ),
@@ -291,3 +291,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+
+
+

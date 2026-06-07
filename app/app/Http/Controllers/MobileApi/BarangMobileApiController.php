@@ -147,6 +147,92 @@ class BarangMobileApiController extends Controller
         ]);
     }
 
+    public function updateStok(Request $request, string $id)
+    {
+        $barang = Barang::findOrFail($id);
+        $request->validate(['jumlah' => 'required|integer']);
+
+        $jumlahBaru = (int) $request->jumlah;
+        $jumlahLama = $barang->jumlah;
+
+        if ($jumlahBaru == $jumlahLama) {
+            return \Illuminate\Support\Facades\Response::json([
+                'message' => 'Stok tidak berubah',
+                'data'    => $barang
+            ]);
+        }
+
+        DB::transaction(function () use ($barang, $jumlahBaru, $jumlahLama) {
+            $barang->update([
+                'jumlah' => $jumlahBaru,
+                'total'  => $barang->harga * $jumlahBaru,
+                'tanggal_restok' => \Carbon\Carbon::now(),
+            ]);
+
+            AktivitasBarang::create([
+                'id_barang'    => $barang->id_barang,
+                'nama_barang'  => $barang->nama,
+                'jenis'        => 'ubah_stok',
+                'jumlah'       => abs($jumlahBaru - $jumlahLama),                 
+                'stok_sebelum' => $jumlahLama,
+                'stok_sesudah' => $jumlahBaru,
+                'harga_satuan' => $barang->harga,
+                'pendapatan'   => 0,
+                'catatan'      => "Set stok manual dari {$jumlahLama} menjadi {$jumlahBaru}",
+                'tanggal'      => \Carbon\Carbon::now(),
+            ]);
+        });
+
+        return \Illuminate\Support\Facades\Response::json([
+            'message' => 'Stok berhasil diperbarui',
+            'data'    => $barang->fresh()
+        ]);
+    }
+
+    public function catatPenjualan(Request $request, string $id)
+    {
+        $barang = Barang::findOrFail($id);
+        $request->validate(['jumlah_terjual' => 'required|integer|min:1']);
+
+        $jumlahTerjual = (int) $request->jumlah_terjual;
+
+        if ($jumlahTerjual > $barang->jumlah) {
+            return \Illuminate\Support\Facades\Response::json([
+                'message' => 'Stok tidak mencukupi'
+            ], 400);
+        }
+
+        $jumlahLama = $barang->jumlah;
+        $jumlahBaru = $jumlahLama - $jumlahTerjual;
+        $pendapatan = $jumlahTerjual * $barang->harga;
+
+        DB::transaction(function () use ($barang, $jumlahTerjual, $jumlahBaru, $jumlahLama, $pendapatan) {
+            $barang->update([
+                'jumlah'         => $jumlahBaru,
+                'total'          => $barang->harga * $jumlahBaru,
+                'jumlah_terjual' => $barang->jumlah_terjual + $jumlahTerjual,
+                'pendapatan'     => $barang->pendapatan + $pendapatan,
+            ]);
+
+            AktivitasBarang::create([
+                'id_barang'    => $barang->id_barang,
+                'nama_barang'  => $barang->nama,
+                'jenis'        => 'barang_keluar',
+                'jumlah'       => $jumlahTerjual,                 
+                'stok_sebelum' => $jumlahLama,
+                'stok_sesudah' => $jumlahBaru,
+                'harga_satuan' => $barang->harga,
+                'pendapatan'   => $pendapatan,
+                'catatan'      => "Pencatatan penjualan sebanyak {$jumlahTerjual} unit",
+                'tanggal'      => \Carbon\Carbon::now(),
+            ]);
+        });
+
+        return \Illuminate\Support\Facades\Response::json([
+            'message' => 'Penjualan berhasil dicatat',
+            'data'    => $barang->fresh()
+        ]);
+    }
     public function destroy(string $id)
     {
         $barang = Barang::findOrFail($id);

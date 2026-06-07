@@ -231,7 +231,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w600,
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withValues(alpha: 0.8),
                       letterSpacing: 0.5,
                     ),
                   ),
@@ -314,3 +314,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 }
+
+
+

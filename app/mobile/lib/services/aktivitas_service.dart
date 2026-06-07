@@ -1,6 +1,7 @@
 // lib/services/aktivitas_service.dart
 
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../config/api_config.dart';
 import 'auth_service.dart';
@@ -45,11 +46,11 @@ class AktivitasService {
       if (response.statusCode == 200) {
         return jsonDecode(response.body) as Map<String, dynamic>;
       } else {
-        print('Gagal memuat data: ${response.statusCode}');
+        debugPrint('Gagal memuat data: ${response.statusCode}');
         return null;
       }
     } catch (e) {
-      print('Error koneksi ApiService: $e');
+      debugPrint('Error koneksi ApiService: $e');
       return null;
     }
   }
@@ -82,11 +83,11 @@ class AktivitasService {
       if (response.statusCode == 200) {
         return response.body; 
       } else {
-        print('Gagal export data: ${response.statusCode}');
+        debugPrint('Gagal export data: ${response.statusCode}');
         return null;
       }
     } catch (e) {
-      print('Error koneksi export: $e');
+      debugPrint('Error koneksi export: $e');
       return null;
     }
   }

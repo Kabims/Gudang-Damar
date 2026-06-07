@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 import 'login_screen.dart';
-import 'riwayat_aktivitas_screen.dart'; 
+import 'riwayat_aktivitas_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -107,7 +107,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         width: double.infinity,
                         child: ElevatedButton.icon(
                           onPressed: () {
-                            // Pindah ke halaman Riwayat Aktivitas
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -125,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary, // Menggunakan warna tema project-mu
+                            backgroundColor: AppColors.primary,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
@@ -134,14 +133,16 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
 
+
+
                       const SizedBox(height: 24),
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
+                          color: AppColors.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: AppColors.primary.withOpacity(0.3),
+                            color: AppColors.primary.withValues(alpha: 0.3),
                           ),
                         ),
                         child: const Row(
@@ -172,3 +173,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+
+
+

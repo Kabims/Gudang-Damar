@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:file_saver/file_saver.dart';
 import '../services/aktivitas_service.dart';
 import 'barang/barang_list_screen.dart';
+import 'pesanan/pesanan_list_screen.dart';
+import 'servis/servis_list_screen.dart';
 
 class RiwayatAktivitasScreen extends StatefulWidget {
   const RiwayatAktivitasScreen({super.key});
@@ -25,8 +27,6 @@ class _RiwayatAktivitasScreenState extends State<RiwayatAktivitasScreen> {
   String _selectedJenis = 'all';
   String _selectedStatus = 'all';
   int _currentPage = 1;
-  int _lastPage = 1;
-  int _totalData = 0;
 
   final TextEditingController _searchController = TextEditingController();
 
@@ -49,8 +49,6 @@ class _RiwayatAktivitasScreenState extends State<RiwayatAktivitasScreen> {
       setState(() {
         _transactions = response['transactions']['data'] ?? [];
         _currentPage = response['transactions']['current_page'] ?? 1;
-        _lastPage = response['transactions']['last_page'] ?? 1;
-        _totalData = response['transactions']['total'] ?? 0;
         _stats = response['stats'] ?? {};
         _isLoading = false;
       });
@@ -70,17 +68,19 @@ class _RiwayatAktivitasScreenState extends State<RiwayatAktivitasScreen> {
         status: _selectedStatus,
       );
 
-      if (csvData != null && mounted) {
+      if (!mounted) return;
+
+      if (csvData != null) {
         final bytes = Uint8List.fromList(csvData.codeUnits);
         final fileName = 'GudangDamar_Export_${DateTime.now().millisecondsSinceEpoch}';
 
-        // --- BAGIAN YANG DIPERBAIKI ---
-        final savedPath = await FileSaver.instance.saveFile(
-          name: '$fileName.csv', // Ekstensi ditambahkan langsung di sini
+        await FileSaver.instance.saveFile(
+          name: '$fileName.csv',
           bytes: bytes,
           mimeType: MimeType.csv,
         );
-        // ------------------------------
+
+        if (!mounted) return;
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -99,6 +99,7 @@ class _RiwayatAktivitasScreenState extends State<RiwayatAktivitasScreen> {
         );
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Terjadi kesalahan: $e'),
@@ -413,6 +414,16 @@ class _RiwayatAktivitasScreenState extends State<RiwayatAktivitasScreen> {
               context,
               MaterialPageRoute(builder: (_) => const BarangListScreen()),
             );
+          } else if (index == 1) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const ServisListScreen()),
+            );
+          } else if (index == 2) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const PesananListScreen()),
+            );
           }
         },
         items: const [
@@ -501,7 +512,7 @@ class AktivitasCard extends StatelessWidget {
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(color: typeColor.withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
+                decoration: BoxDecoration(color: typeColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
                 child: Text(type, style: TextStyle(fontSize: 9, color: typeColor, fontWeight: FontWeight.bold)),
               ),
               Text(date, style: const TextStyle(fontSize: 10, color: Colors.grey)),
