@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'screens/home_screen.dart';
 import 'screens/register_screen.dart';
+import 'screens/riwayat_aktivitas_screen.dart';
 import 'services/auth_service.dart';
 import 'theme/app_theme.dart';
 
@@ -63,6 +63,6 @@ class _AuthGateState extends State<_AuthGate> {
         body: Center(child: CircularProgressIndicator()),
       );
     }
-    return _loggedIn ? const HomeScreen() : const RegisterScreen();
+    return _loggedIn ? const RiwayatAktivitasScreen() : const RegisterScreen();
   }
 }

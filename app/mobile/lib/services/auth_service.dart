@@ -174,8 +174,17 @@ class AuthService {
         },
       );
 
+      // Inject googleUser photoUrl if not provided by backend
+      final userMap = body['user'] as Map<String, dynamic>;
+      if (userMap['profile_photo_url'] == null && googleUser.photoUrl != null) {
+        userMap['profile_photo_url'] = googleUser.photoUrl;
+      }
+
       // 4. Simpan token & user
-      await _saveAuth(body['token'] as String, body['user'] as Map<String, dynamic>);
+      await _saveAuth(body['token'] as String, userMap);
+      
+      // Update body with injected user
+      body['user'] = userMap;
       return body;
     } on ApiException {
       rethrow;
