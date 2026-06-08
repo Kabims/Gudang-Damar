@@ -5,8 +5,8 @@ import '../services/api_exception.dart';
 import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/auth_scaffold.dart';
-import 'home_screen.dart';
 import 'register_screen.dart';
+import 'riwayat_aktivitas_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -50,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
+        MaterialPageRoute(builder: (_) => const RiwayatAktivitasScreen()),
       );
     } on ApiException catch (e) {
       setState(() {
@@ -83,7 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
+        MaterialPageRoute(builder: (_) => const RiwayatAktivitasScreen()),
       );
     } on ApiException catch (e) {
       setState(() => _serverError = e.message);

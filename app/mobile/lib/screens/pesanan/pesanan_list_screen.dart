@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/pesanan.dart';
 import '../../services/pesanan_service.dart';
+import '../../widgets/user_profile_avatar_button.dart';
 
 import '../../widgets/inventory_shared.dart';
 import '../barang/barang_list_screen.dart';
@@ -92,9 +93,9 @@ class _PesananListScreenState extends State<PesananListScreen> {
           ],
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.account_circle_outlined, color: Colors.white, size: 28),
-            onPressed: () {},
+          const UserProfileAvatarButton(
+            fallbackIconColor: Colors.white,
+            radius: 14,
           ),
         ],
         bottom: PreferredSize(

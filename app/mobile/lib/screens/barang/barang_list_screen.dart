@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../models/barang.dart';
 import '../../services/barang_service.dart';
 import '../../widgets/inventory_shared.dart';
+import '../../widgets/user_profile_avatar_button.dart';
 import '../pesanan/pesanan_list_screen.dart';
 import '../servis/servis_list_screen.dart';
 import 'barang_tambah_sheet.dart';
@@ -123,13 +124,9 @@ class _BarangListScreenState extends State<BarangListScreen> {
           ],
         ),
         actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.account_circle_outlined,
-              color: Colors.white,
-              size: 28,
-            ),
-            onPressed: () {},
+          const UserProfileAvatarButton(
+            fallbackIconColor: Colors.white,
+            radius: 14,
           ),
           const SizedBox(width: 8),
         ],

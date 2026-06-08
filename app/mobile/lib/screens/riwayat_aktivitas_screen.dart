@@ -3,7 +3,9 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:file_saver/file_saver.dart';
+import '../theme/app_theme.dart';
 import '../services/aktivitas_service.dart';
+import '../widgets/user_profile_avatar_button.dart';
 import 'barang/barang_list_screen.dart';
 import 'pesanan/pesanan_list_screen.dart';
 import 'servis/servis_list_screen.dart';
@@ -150,30 +152,46 @@ class _RiwayatAktivitasScreenState extends State<RiwayatAktivitasScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.primary,
         elevation: 0,
-        centerTitle: false,
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: Color(0xFF0F172A)),
-          onPressed: () {},
-        ),
-        title: const Text(
-          'Gudang Damar',
-          style: TextStyle(
-            color: Color(0xFF0F172A),
-            fontWeight: FontWeight.w700,
-            fontSize: 18,
-          ),
+        automaticallyImplyLeading: false,
+        title: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: Image.asset(
+                'assets/images/LogoDamar.jpeg',
+                width: 32,
+                height: 32,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    const Icon(Icons.broken_image, color: Colors.white),
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Text(
+              'Gudang Damar',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: 18,
+              ),
+            ),
+          ],
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.account_circle_outlined, color: Color(0xFF0F172A), size: 28),
-            onPressed: () {},
+          const UserProfileAvatarButton(
+            fallbackIconColor: Colors.white,
+            radius: 14,
           ),
+          const SizedBox(width: 8),
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1.0),
-          child: Container(color: const Color(0xFFE2E8F0), height: 1.0),
+          child: Container(
+            color: Colors.white.withValues(alpha: 0.2),
+            height: 1.0,
+          ),
         ),
       ),
       body: RefreshIndicator(
