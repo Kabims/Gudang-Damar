@@ -7,10 +7,12 @@
       "name": "mobile",
       "version": "1.0.0+1",
       "dependencies": [
+        "crypto",
         "cupertino_icons",
         "file_saver",
         "flutter",
         "flutter_secure_storage",
+        "google_generative_ai",
         "google_sign_in",
         "http",
         "web"
@@ -43,6 +45,20 @@
         "stream_channel",
         "test_api",
         "vector_math"
+      ]
+    },
+    {
+      "name": "crypto",
+      "version": "3.0.7",
+      "dependencies": [
+        "typed_data"
+      ]
+    },
+    {
+      "name": "google_generative_ai",
+      "version": "0.4.7",
+      "dependencies": [
+        "http"
       ]
     },
     {
@@ -200,6 +216,13 @@
         "stream_channel",
         "string_scanner",
         "term_glyph"
+      ]
+    },
+    {
+      "name": "typed_data",
+      "version": "1.4.0",
+      "dependencies": [
+        "collection"
       ]
     },
     {
@@ -492,13 +515,6 @@
       ]
     },
     {
-      "name": "typed_data",
-      "version": "1.4.0",
-      "dependencies": [
-        "collection"
-      ]
-    },
-    {
       "name": "google_identity_services_web",
       "version": "0.3.3+1",
       "dependencies": [
@@ -619,13 +635,6 @@
         "collection",
         "meta",
         "pub_semver"
-      ]
-    },
-    {
-      "name": "crypto",
-      "version": "3.0.7",
-      "dependencies": [
-        "typed_data"
       ]
     }
   ],

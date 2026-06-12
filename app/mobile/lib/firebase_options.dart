@@ -47,7 +47,7 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAsMoAlIt3yL7KJKI-tRzhDhUfZBS9zLUM',
+    apiKey: const String.fromEnvironment('GOOGLE_API_KEY', defaultValue: '--- IGNORE ---'),
     appId: '1:103027535175:web:ab19ee3db40995dec53062',
     messagingSenderId: '103027535175',
     projectId: 'gudang-damar-5e2b7',
@@ -57,7 +57,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyC7VzOQsCji3lcdtWxNdT_7OjtBKnZEzfg',
+    apiKey: const String.fromEnvironment('GOOGLE_API_KEY', defaultValue: '--- IGNORE ---'),
     appId: '1:103027535175:android:81e1f1d531147017c53062',
     messagingSenderId: '103027535175',
     projectId: 'gudang-damar-5e2b7',
@@ -65,7 +65,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyAsMoAlIt3yL7KJKI-tRzhDhUfZBS9zLUM',
+    apiKey: const String.fromEnvironment('GOOGLE_API_KEY', defaultValue: '--- IGNORE ---'),
     appId: '1:103027535175:web:f66a34dd4d81dcccc53062',
     messagingSenderId: '103027535175',
     projectId: 'gudang-damar-5e2b7',
