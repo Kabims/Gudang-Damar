@@ -138,6 +138,12 @@ class AuthMobileApiController extends Controller
             'id_token' => $request->id_token,
         ]);
 
+        \Log::info('Google Auth Debug', [
+            'config_client_id' => $clientId,
+            'google_response' => $response->json(),
+            'response_status' => $response->status(),
+        ]);
+
         if ($response->failed() || $response->json('aud') !== $clientId) {
             return response()->json(['message' => 'Token Google tidak valid'], 401);
         }

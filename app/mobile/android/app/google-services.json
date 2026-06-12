@@ -1,29 +1,47 @@
 {
-    "project_info": {
-        "project_number": "551713432369",
-        "project_id": "gudang-damar-497702-5e446",
-        "storage_bucket": "gudang-damar-497702-5e446.firebasestorage.app"
-    },
-    "client": [
-        {
-            "client_info": {
-                "mobilesdk_app_id": "1:551713432369:android:b4c77929f2ee0dfe664610",
-                "android_client_info": {
-                    "package_name": "com.gudangdamar.app"
-                }
-            },
-            "oauth_client": [],
-            "api_key": [
-                {
-                    "current_key": ""
-                }
-            ],
-            "services": {
-                "appinvite_service": {
-                    "other_platform_oauth_client": []
-                }
-            }
+  "project_info": {
+    "project_number": "103027535175",
+    "project_id": "gudang-damar-5e2b7",
+    "storage_bucket": "gudang-damar-5e2b7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:103027535175:android:81e1f1d531147017c53062",
+        "android_client_info": {
+          "package_name": "com.gudangdamar.app"
         }
-    ],
-    "configuration_version": "1"
+      },
+      "oauth_client": [
+        {
+          "client_id": "103027535175-mlv6638emkhiro81kais7j337igr9op0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gudangdamar.app",
+            "certificate_hash": "7c834686f3dd9208d1d1edcbde9113e00f3f63b6"
+          }
+        },
+        {
+          "client_id": "103027535175-gq9cidevtiuvi51l4m9kot0f2s63jdmr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7VzOQsCji3lcdtWxNdT_7OjtBKnZEzfg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "103027535175-gq9cidevtiuvi51l4m9kot0f2s63jdmr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
 }

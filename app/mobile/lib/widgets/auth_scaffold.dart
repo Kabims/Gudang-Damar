@@ -16,7 +16,7 @@ class AuthScaffold extends StatelessWidget {
         children: [
           // Background image
           Image.asset(
-            'assets/images/BackGroundDevo.png',
+            'assets/images/BackgroundDevo.png',
             fit: BoxFit.cover,
           ),
 
