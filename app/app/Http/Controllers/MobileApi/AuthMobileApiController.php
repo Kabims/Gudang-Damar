@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Http;
@@ -174,5 +175,28 @@ class AuthMobileApiController extends Controller
             'user'    => $user,
             'token'   => $token,
         ]);
+    }
+
+    public function forgotPassword(Request $request): JsonResponse
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ], [
+            'email.exists' => 'Email tidak terdaftar di sistem kami.',
+        ]);
+
+        $status = Password::broker()->sendResetLink(
+            $request->only('email')
+        );
+
+        if ($status === Password::RESET_LINK_SENT) {
+            return response()->json([
+                'message' => 'Link reset password telah dikirim ke email Anda.'
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Gagal mengirim link reset password.'
+        ], 400);
     }
 }

@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register',     [AuthMobileApiController::class, 'register']);
 Route::post('/login',        [AuthMobileApiController::class, 'login']);
 Route::post('/auth/google',  [AuthMobileApiController::class, 'googleLogin']);
+Route::post('/forgot-password', [AuthMobileApiController::class, 'forgotPassword']);
 
 // Protected — wajib membawa token Sanctum
 Route::middleware('auth:sanctum')->group(function () {

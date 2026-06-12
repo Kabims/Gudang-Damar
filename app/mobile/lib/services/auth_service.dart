@@ -105,6 +105,14 @@ class AuthService {
     return body;
   }
 
+  /// Mengirim permintaan reset password ke email user
+  Future<String> forgotPassword({required String email}) async {
+    final body = await _post(ApiConfig.forgotPassword, {
+      'email': email,
+    });
+    return body['message'] as String? ?? 'Link reset sudah dikirim.';
+  }
+
   Future<Map<String, dynamic>> login({
     required String email,
     required String password,

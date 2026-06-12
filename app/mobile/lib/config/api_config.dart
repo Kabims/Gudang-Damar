@@ -29,6 +29,7 @@ class ApiConfig {
   static String get login    => '$apiUrl/login';
   static String get logout   => '$apiUrl/logout';
   static String get me       => '$apiUrl/me';
+  static String get forgotPassword => '$apiUrl/forgot-password';
 
   static const Duration timeout = Duration(seconds: 30);
 }
