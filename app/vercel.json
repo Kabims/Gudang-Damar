@@ -11,15 +11,15 @@
   "outputDirectory": "public",
   "routes": [
     {
-      "handle": "filesystem"
-    },
-    {
       "src": "/debug",
       "dest": "/api/debug.php"
     },
     {
-      "src": "/(.*)",
+      "src": "^(?!/build/)(.*)$",
       "dest": "/api/index.php"
+    },
+    {
+      "handle": "filesystem"
     }
   ],
   "env": {
