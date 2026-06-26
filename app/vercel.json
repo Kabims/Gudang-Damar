@@ -15,11 +15,32 @@
       "dest": "/api/debug.php"
     },
     {
-      "src": "^(?!/build/)(.*)$",
-      "dest": "/api/index.php"
+      "src": "/build/(.*)",
+      "dest": "/public/build/$1"
     },
     {
-      "handle": "filesystem"
+      "src": "/gambar/(.*)",
+      "dest": "/public/gambar/$1"
+    },
+    {
+      "src": "/favicon.ico",
+      "dest": "/public/favicon.ico"
+    },
+    {
+      "src": "/favicon.svg",
+      "dest": "/public/favicon.svg"
+    },
+    {
+      "src": "/robots.txt",
+      "dest": "/public/robots.txt"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "dest": "/public/apple-touch-icon.png"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api/index.php"
     }
   ],
   "env": {
