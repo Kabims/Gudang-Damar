@@ -27,7 +27,13 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);
-    })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->reportable(function (\Throwable $e) {
+            \Log::error("=== ORIGINAL EXCEPTION REPORTED ===");
+            \Log::error("Exception: " . get_class($e));
+            \Log::error("Message: " . $e->getMessage());
+            \Log::error("File: " . $e->getFile() . ":" . $e->getLine());
+            \Log::error("Stack Trace: " . $e->getTraceAsString());
+            \Log::error("====================================");
+        });
     })->create();
