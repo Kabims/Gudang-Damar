@@ -15,10 +15,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // On Vercel, the filesystem is read-only. Redirect storage to /tmp.
-        if (getenv('VERCEL') === '1') {
-            $this->app->useStoragePath('/tmp/storage');
-        }
+        //
     }
 
     /**
