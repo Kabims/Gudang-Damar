@@ -27,7 +27,7 @@ echo "PHP Version: " . PHP_VERSION . "\n";
 echo "OS: " . PHP_OS . "\n\n";
 
 echo "=== ENVIRONMENT VARIABLES ===\n";
-$envVars = ['APP_KEY', 'APP_ENV', 'APP_DEBUG', 'DB_CONNECTION', 'DB_URL', 'VIEW_COMPILED_PATH', 'SESSION_DRIVER', 'CACHE_STORE', 'LOG_CHANNEL', 'VERCEL', 'GOOGLE_CLIENT_ID'];
+$envVars = ['APP_KEY', 'APP_ENV', 'APP_DEBUG', 'DB_CONNECTION', 'DB_URL', 'VIEW_COMPILED_PATH', 'SESSION_DRIVER', 'CACHE_STORE', 'LOG_CHANNEL', 'VERCEL'];
 foreach ($envVars as $var) {
     $val = getenv($var);
     if (in_array($var, ['APP_KEY', 'DB_URL', 'DB_PASSWORD']) && $val) {
