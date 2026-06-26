@@ -11,6 +11,9 @@
   "outputDirectory": "public",
   "routes": [
     {
+      "handle": "filesystem"
+    },
+    {
       "src": "/debug",
       "dest": "/api/debug.php"
     },
