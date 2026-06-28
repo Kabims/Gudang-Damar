@@ -8,18 +8,20 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Support\Facades\Route;
 
-return Application::configure(basePath: dirname(__DIR__))
+$app = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
-        then: function () {                                       // ← BARU
-        Route::middleware('api')                              // ← BARU
-            ->prefix('mobile-api')                            // ← BARU
-            ->group(base_path('routes/mobile_api.php'));      // ← BARU
+        then: function () {
+        Route::middleware('api')
+            ->prefix('mobile-api')
+            ->group(base_path('routes/mobile_api.php'));
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->trustProxies(at: '*');
+
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
         $middleware->web(append: [
@@ -29,5 +31,21 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->reportable(function (\Throwable $e) {
+            error_log("=== ORIGINAL EXCEPTION REPORTED ===");
+            error_log("Exception: " . get_class($e));
+            error_log("Message: " . $e->getMessage());
+            error_log("File: " . $e->getFile() . ":" . $e->getLine());
+            error_log("Trace: " . $e->getTraceAsString());
+            error_log("====================================");
+        });
     })->create();
+
+// On Vercel, filesystem is read-only except /tmp.
+// Redirect bootstrap cache and storage paths BEFORE ProviderRepository reads them.
+if (getenv('VERCEL') === '1') {
+    $app->useBootstrapPath('/tmp/bootstrap');
+    $app->useStoragePath('/tmp/storage');
+}
+
+return $app;

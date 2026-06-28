@@ -722,12 +722,12 @@ class _PesananListScreenState extends State<PesananListScreen> {
                         if (confirm && mounted) {
                           try {
                             await _service.tandaiSelesai(pesanan.idPesanan);
-                            if (context.mounted) {
-                              showSuccess(context, 'Pesanan ditandai selesai');
-                            }
+                            if (!mounted) return;
+                            showSuccess(context, 'Pesanan ditandai selesai');
                             _loadData();
                           } catch (e) {
-                            if (context.mounted) showError(context, e.toString());
+                            if (!mounted) return;
+                            showError(context, e.toString());
                           }
                         }
                       },
@@ -768,12 +768,12 @@ class _PesananListScreenState extends State<PesananListScreen> {
                         
                         try {
                           await _service.hapusPesanan(id);
-                          if (context.mounted) showSuccess(context, 'Pesanan berhasil dihapus');
+                          if (!mounted) return;
+                          showSuccess(context, 'Pesanan berhasil dihapus');
                         } catch (e) {
-                          if (context.mounted) {
-                            if (deletedItem != null) setState(() => _pesananList.insert(idx, deletedItem));
-                            showError(context, e.toString());
-                          }
+                          if (!mounted) return;
+                          if (deletedItem != null) setState(() => _pesananList.insert(idx, deletedItem));
+                          showError(context, e.toString());
                         }
                       }
                     },

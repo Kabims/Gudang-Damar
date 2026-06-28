@@ -1,0 +1,57 @@
+{
+  "version": 2,
+  "functions": {
+    "api/index.php": {
+      "runtime": "vercel-php@0.9.0"
+    },
+    "api/debug.php": {
+      "runtime": "vercel-php@0.9.0"
+    }
+  },
+  "outputDirectory": "public",
+  "routes": [
+    {
+      "src": "/debug",
+      "dest": "/api/debug.php"
+    },
+    {
+      "src": "/build/(.*)",
+      "dest": "/public/build/$1"
+    },
+    {
+      "src": "/gambar/(.*)",
+      "dest": "/public/gambar/$1"
+    },
+    {
+      "src": "/favicon.ico",
+      "dest": "/public/favicon.ico"
+    },
+    {
+      "src": "/favicon.svg",
+      "dest": "/public/favicon.svg"
+    },
+    {
+      "src": "/robots.txt",
+      "dest": "/public/robots.txt"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "dest": "/public/apple-touch-icon.png"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api/index.php"
+    }
+  ],
+  "env": {
+    "APP_ENV": "production",
+    "APP_DEBUG": "false",
+    "APP_URL": "https://gudang-damar.vercel.app",
+    "GOOGLE_REDIRECT_URI": "https://gudang-damar.vercel.app/auth/google/callback",
+    "LOG_CHANNEL": "stderr",
+    "CACHE_STORE": "array",
+    "SESSION_DRIVER": "cookie",
+    "VIEW_COMPILED_PATH": "/tmp/storage/framework/views",
+    "VERCEL": "1"
+  }
+}
