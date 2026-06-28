@@ -48,23 +48,9 @@ class ImageService
         Log::info('Pollinations full prompt (EN): ' . $fullPrompt);
 
         $encodedPrompt = urlencode($fullPrompt);
-        $imageUrl = "https://image.pollinations.ai/prompt/{$encodedPrompt}?width=1024&height=1024&nologo=true";
-
-        try {
-            $response = Http::timeout(120)->get($imageUrl);
-
-            if ($response->failed()) {
-                throw new Exception("Gagal mengunduh gambar dari Pollinations.");
-            }
-
-            $filename = 'generated/' . Str::uuid() . '.png';
-            Storage::disk('public')->put($filename, $response->body());
-
-            return Storage::url($filename);
-
-        } catch (Exception $e) {
-            Log::error('Pollinations Error: ' . $e->getMessage());
-            throw new Exception("Gagal membuat gambar: " . $e->getMessage());
-        }
+        $seed = rand(1, 9999999);
+        
+        // Kembalikan URL langsung dari Pollinations AI dengan seed acak agar gambar selalu baru
+        return "https://image.pollinations.ai/prompt/{$encodedPrompt}?width=1024&height=1024&nologo=true&seed={$seed}";
     }
 }
