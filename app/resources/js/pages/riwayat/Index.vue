@@ -283,7 +283,7 @@ const exportData = () => {
                     <!-- BUTTON GRAFIK -->
                     <Link 
                         href="/grafik"
-                        class="flex items-center gap-2 bg-white border border-slate-200 text-primary px-4 py-2.5 rounded-lg font-bold text-sm hover:bg-slate-50 transition-all"
+                        class="flex items-center gap-2 bg-[#001e40] text-white px-4 py-2.5 rounded-lg font-bold text-sm hover:bg-[#001e40]/90 transition-all shadow-md shadow-[#001e40]/20"
                     >
                         <span class="material-symbols-outlined text-lg">leaderboard</span>
                         Grafik
