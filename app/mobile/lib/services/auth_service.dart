@@ -41,7 +41,7 @@ class AuthService {
   /// agar library bisa meminta idToken yang bisa diverifikasi oleh server Laravel.
   /// PENTING: Ini bukan Android Client ID, melainkan Web Client ID.
   static const _webClientId =
-      '103027535175-gq9cidevtiuvi51l4m9kot0f2s63jdmr.apps.googleusercontent.com';
+      '679503972-aeo51u0fbbr6de6isdu31op8tgbok00f.apps.googleusercontent.com';
 
   late final _googleSignIn = GoogleSignIn(
     // serverClientId diperlukan agar auth.idToken tidak null saat dikirim ke backend.
