@@ -203,7 +203,7 @@ class _GrafikAktivitasScreenState extends State<GrafikAktivitasScreen> {
                             child: BarChart(
                               BarChartData(
                                 alignment: BarChartAlignment.spaceAround,
-                                maxY: 40,
+                                maxY: totalTransaksi.toDouble() + 5,
                                 barTouchData: BarTouchData(enabled: true),
                                 titlesData: FlTitlesData(
                                   show: true,
