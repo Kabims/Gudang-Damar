@@ -130,13 +130,15 @@ class _GrafikAktivitasScreenState extends State<GrafikAktivitasScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
+                        Expanded(
+                          child: const Text(
                           'Visualisasi & Grafik',
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.w800,
                             color: Color(0xFF0F172A),
                           ),
+                        ),
                         ),
                         // Dropdown Filter Periode
                         Container(
@@ -166,6 +168,7 @@ class _GrafikAktivitasScreenState extends State<GrafikAktivitasScreen> {
                             ),
                           ),
                         ),
+                        const SizedBox(width: 12),
                       ],
                     ),
                     const SizedBox(height: 20),
@@ -203,7 +206,7 @@ class _GrafikAktivitasScreenState extends State<GrafikAktivitasScreen> {
                             child: BarChart(
                               BarChartData(
                                 alignment: BarChartAlignment.spaceAround,
-                                maxY: 40,
+                                maxY: totalTransaksi.toDouble() + 5,
                                 barTouchData: BarTouchData(enabled: true),
                                 titlesData: FlTitlesData(
                                   show: true,
