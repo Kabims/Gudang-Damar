@@ -90,10 +90,10 @@ class GrafikController extends Controller
         // ── Hitung revenue 3 periode sekaligus dengan 1 query per tabel ──
         $thisMonthStart = $nowLocal->copy()->startOfMonth()->setTimezone('UTC')->toDateTimeString();
         $thisMonthEnd   = $nowLocal->copy()->endOfMonth()->setTimezone('UTC')->toDateTimeString();
-        $lastMonthStart = $nowLocal->copy()->subMonth()->startOfMonth()->setTimezone('UTC')->toDateTimeString();
-        $lastMonthEnd   = $nowLocal->copy()->subMonth()->endOfMonth()->setTimezone('UTC')->toDateTimeString();
-        $sameMonthLastYearStart = $nowLocal->copy()->subYear()->startOfMonth()->setTimezone('UTC')->toDateTimeString();
-        $sameMonthLastYearEnd   = $nowLocal->copy()->subYear()->endOfMonth()->setTimezone('UTC')->toDateTimeString();
+        $lastMonthStart = $nowLocal->copy()->startOfMonth()->subMonth()->setTimezone('UTC')->toDateTimeString();
+        $lastMonthEnd   = $nowLocal->copy()->startOfMonth()->subMonth()->endOfMonth()->setTimezone('UTC')->toDateTimeString();
+        $sameMonthLastYearStart = $nowLocal->copy()->startOfMonth()->subYear()->setTimezone('UTC')->toDateTimeString();
+        $sameMonthLastYearEnd   = $nowLocal->copy()->startOfMonth()->subYear()->endOfMonth()->setTimezone('UTC')->toDateTimeString();
 
         // Barang revenue - 1 query untuk 3 periode
         $barangRevenues = DB::table('aktivitas_barang')
@@ -156,7 +156,7 @@ class GrafikController extends Controller
      */
     private function getPeakPeriod(Carbon $nowLocal): array
     {
-        $scanStart = $nowLocal->copy()->subYears(2)->startOfMonth()->setTimezone('UTC')->toDateTimeString();
+        $scanStart = $nowLocal->copy()->startOfMonth()->subYears(2)->setTimezone('UTC')->toDateTimeString();
         $scanEnd   = $nowLocal->copy()->endOfMonth()->setTimezone('UTC')->toDateTimeString();
 
         // Barang revenue per bulan (1 query)
@@ -194,7 +194,7 @@ class GrafikController extends Controller
             ->keyBy(fn($r) => $r->yr . '-' . $r->mo);
 
         // Gabungkan dan cari bulan puncak
-        $startOfScan = $nowLocal->copy()->subYears(2)->startOfMonth();
+        $startOfScan = $nowLocal->copy()->startOfMonth()->subYears(2);
         $bestRevenue = 0;
         $bestYear    = $startOfScan->year;
         $bestMonth   = $startOfScan->month;
@@ -364,7 +364,7 @@ class GrafikController extends Controller
                 break;
 
             case '3M':
-                $startLocal = $nowLocal->copy()->subMonths(3)->startOfWeek();
+                $startLocal = $nowLocal->copy()->startOfMonth()->subMonths(3)->startOfWeek();
                 $weekLocal  = $startLocal->copy();
                 while ($weekLocal->lte($nowLocal)) {
                     $fromLocal = $weekLocal->copy()->startOfWeek();
@@ -380,7 +380,7 @@ class GrafikController extends Controller
 
             case '1Y':
                 for ($m = 12; $m >= 0; $m--) {
-                    $fromLocal = $nowLocal->copy()->subMonths($m)->startOfMonth();
+                    $fromLocal = $nowLocal->copy()->startOfMonth()->subMonths($m);
                     $toLocal   = $fromLocal->copy()->endOfMonth();
                     $buckets[] = [
                         'label' => strtoupper($fromLocal->format('M')),
