@@ -601,43 +601,52 @@ class _ServisListScreenState extends State<ServisListScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF5F7FA),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(
-                      Icons.build,
-                      color: AppColors.primaryDark,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        servis.namaBarang,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
-                        ),
+              Expanded(
+                child: Row(
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF5F7FA),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      Text(
-                        'Bahan: ${servis.bahan}',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AppColors.textSecondary,
-                        ),
+                      child: const Icon(
+                        Icons.build,
+                        color: AppColors.primaryDark,
                       ),
-                    ],
-                  ),
-                ],
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            servis.namaBarang,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimary,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                          Text(
+                            'Bahan: ${servis.bahan}',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppColors.textSecondary,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: 16),
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,
@@ -854,6 +863,8 @@ class _ServisListScreenState extends State<ServisListScreen> {
             fontWeight: isPrice ? FontWeight.bold : FontWeight.w500,
             color: isPrice ? AppColors.primary : AppColors.textPrimary,
           ),
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
         ),
       ],
     );
